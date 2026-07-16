@@ -19,7 +19,8 @@ import fs from "fs"
                 resource_type: "auto"
             })
             //file has been uploaded successfully
-            console.log("FILE IS UPLOADED ON CLOUDINARY", response.url);
+          //  console.log("FILE IS UPLOADED ON CLOUDINARY", response.url);
+          fs.unlinkSync(localFilePath)
             return response;
 
         } catch (error) {
@@ -31,8 +32,8 @@ import fs from "fs"
     export {uploadOnCloudinary}
 
     
-    cloudinary.v2.uploader.upload(
-           'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg', 
-           {public_id: 'shoes'},
-           function(error, result) {console.log(result)}
-        )
+    // cloudinary.v2.uploader.upload(
+    //        'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg', 
+    //        {public_id: 'shoes'},
+    //        function(error, result) {console.log(result)}
+    //     )
