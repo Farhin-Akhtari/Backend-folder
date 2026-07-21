@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { asyncHandler} from "../utils/asyncHandler";
-import { ApiResponse } from "../utils/ApiResponse";
-import { User } from "../models/user.models";
-import { ApiError } from "../utils/ApiError";
+import { asyncHandler} from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { User } from "../models/user.models.js";
+import { ApiError } from "../utils/ApiError.js";
 
 const healthCheck = asyncHandler(async (req, res) => {
     return res
