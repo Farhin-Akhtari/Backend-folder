@@ -18,12 +18,14 @@ app.use(cookieParser())
 import userRouter from "./routes/user.routes.js"
 import healthCheckRouter from "./routes/healthcheck.routes.js";
 import videoRouter from "./routes/video.routes.js"
+import subscriptionRouter from "./routes/subscription.routes.js"
 
 //routes declaration
 
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/healthCheck", healthCheckRouter)
 app.use("/api/v1/videos", videoRouter)
+app.use("/api/v1/subscriptions", subscriptionRouter)
 
 //http://localhost:8000/api/v1/users/register   (WE MADE THIS KIND OF ROUTER)
 
