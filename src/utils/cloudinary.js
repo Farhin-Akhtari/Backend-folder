@@ -20,20 +20,36 @@ import fs from "fs"
             })
             //file has been uploaded successfully
           //  console.log("FILE IS UPLOADED ON CLOUDINARY", response.url);
+          
           fs.unlinkSync(localFilePath)
             return response;
 
         } catch (error) {
-            fs.unlinkSync(localFilePath) //remove the locally saved temporay file as the upload operation got failed
-            return null;
+           console.log("Cloudinary upload error:", error);
+
+           if (fs.existsSync(localFilePath)) {
+               fs.unlinkSync(localFilePath);
+            }
+
+        return null;
         }
     }
 
-    export {uploadOnCloudinary}
+ const deleteOnCloudinary = async(public_id, resource_type="image") => {
+    try {
+        if(!public_id)
+            return console.log("PUBLIC ID IS REQUIRED");
 
-    
-    // cloudinary.v2.uploader.upload(
-    //        'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg', 
-    //        {public_id: 'shoes'},
-    //        function(error, result) {console.log(result)}
-    //     )
+        const response = await cloudinary.uploader.destroy(public_id, {
+            resource_type
+        });
+        return response;
+
+    } catch (error) {
+        console.log("Delete on cloudinary failed", error);
+        return error;
+    }
+
+ }
+
+     export {uploadOnCloudinary, deleteOnCloudinary}

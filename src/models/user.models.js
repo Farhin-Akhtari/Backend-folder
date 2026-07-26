@@ -4,7 +4,6 @@ import bcrypt from "bcrypt"
 //import { use } from "react";
 
 
-
 const userSchema = new Schema({
     username: {
         type: String,

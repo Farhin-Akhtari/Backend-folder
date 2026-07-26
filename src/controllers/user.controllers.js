@@ -345,7 +345,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
          from: "subscriptions",
          localField: "_id",
          foreignField: "channel",
-         as: "subscribers"
+         as: "subscribedTo"
       }
    },
    {
@@ -353,7 +353,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
          from: "subscriptions",
          localField: "_id",
          foreignField: "subscriber",
-         as: "subscribedTo"
+         as: "subscribers"
       }
    },
    {
@@ -361,8 +361,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
          subscribersCount: {
             $size: "$subscribers"
          },
-         channelSubscribedToCount: {
-            $size: "$subscribedTo"
+          channelSubscribedToCount: {
+             $size: "$subscribedTo"
          },
          isSubscribed: {
             $cond: {
