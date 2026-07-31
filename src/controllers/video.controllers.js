@@ -354,7 +354,8 @@ const updateVideo = asyncHandler(async (req, res) => {
     if(description?.trim()){
         updateFields.description = description.trim();
     }
-     
+    
+    //if no fields are given 
     if(Object.keys(updateFields).length === 0){
         throw new ApiError(400, "Atleast one field is required to update")
     }
