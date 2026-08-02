@@ -184,7 +184,7 @@ Used stages include:
 Clone the repository
 
 ```bash
-git clone https://github.com/your-username/your-repository.git
+git clone https://github.com/Farhin-Akhtari/Backend-folder.git
 ```
 
 Install dependencies
@@ -193,7 +193,7 @@ Install dependencies
 npm install
 ```
 
-Create a `.env` file
+Create a `.env` file using `.env.sample`
 
 ```env
 PORT=8000
