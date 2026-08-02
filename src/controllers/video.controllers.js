@@ -94,10 +94,36 @@ const getAllVideos = asyncHandler(async (req, res) => {
         }
     },
     {
+        $lookup: {
+            from: "likes",
+            localField: "_id",
+            foreignField: "video",
+            as: "likes"
+        }
+    },
+    {
+        $lookup: {
+            from: "comments",
+            localField: "_id",
+            foreignField: "video",
+            as: "comments"
+        }
+    },
+    {
         $addFields: {
             owner: {
                 $first: "$ownerDetails"
             },
+            likesCount: {
+                $size: "$likes"
+            },
+            isLiked: {
+               $in: 
+                [new mongoose.Types.ObjectId(req.user?._id), "$likes.likedBy"],
+            },
+            commentsCount: {
+                $size: "$comments"
+            }
         }
     },
     {
@@ -107,7 +133,10 @@ const getAllVideos = asyncHandler(async (req, res) => {
         duration: 1,
         views: 1,
         createdAt: 1,
-        owner: 1
+        owner: 1,
+        likesCount: 1,
+        isLiked: 1,
+        commentsCount: 1
         }
     }
     
