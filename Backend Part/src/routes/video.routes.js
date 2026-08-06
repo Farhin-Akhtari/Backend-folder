@@ -6,7 +6,7 @@ import { deleteVideo, getAllVideos, getVideoById, publishVideo, toggleStatus, up
 const router = Router();
 
 router.route("/")
-    .get(verifyJWT, getAllVideos)
+    .get(getAllVideos)
     .post(verifyJWT, upload.fields([
             {
                 name: "videoFile",

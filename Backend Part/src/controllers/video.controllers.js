@@ -41,7 +41,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
      // If this isn't the logged-in user's channel,
     // only show published videos.
-    if(userId !== req.user._id.toString()){
+    if(!req.user || userId !== req.user._id.toString()){
         matchConditions.isPublished = true;
     }
   }else{
@@ -117,10 +117,14 @@ const getAllVideos = asyncHandler(async (req, res) => {
             likesCount: {
                 $size: "$likes"
             },
-            isLiked: {
-               $in: 
-                [new mongoose.Types.ObjectId(req.user?._id), "$likes.likedBy"],
-            },
+           isLiked: req.user
+             ? {
+               $in: [
+                  new mongoose.Types.ObjectId(req.user._id),
+                  "$likes.likedBy"
+                ]
+                }
+                : false,
             commentsCount: {
                 $size: "$comments"
             }
