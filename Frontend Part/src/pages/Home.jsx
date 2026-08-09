@@ -14,10 +14,9 @@ function Home() {
         try {
           const response = await getAllVideos();
 
-            console.log("Full Response:", response);
-            console.log("Response Data:", response.data);
+           console.log("Videos:", response);
 
-         setVideos(videos);
+         setVideos(response);
           } catch (err) {
              console.error(err);
              setError("Failed to fetch videos");
@@ -44,6 +43,7 @@ function Home() {
       </h2>
     );
   }
+  console.log("videos state:", videos);
 
   return (
    <div>
@@ -56,6 +56,7 @@ function Home() {
        {videos.map((video) => (
         <VideoCard
             key={video._id}
+            videoId={video._id}
             title={video.title}
             channel={video.owner?.username}
             views={video.views}
