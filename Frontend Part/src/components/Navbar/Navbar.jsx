@@ -10,8 +10,16 @@ function Navbar() {
     JSON.parse(localStorage.getItem("user"))
   );
 
+  const [search, setSearch] = useState("");
+
   const [showMenu, setShowMenu] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
+
+  const handleSearch = () => {
+  if (!search.trim()) return;
+
+  navigate(`/?search=${encodeURIComponent(search.trim())}`);
+ };
 
  const handleLogout = async () => {
   try {
@@ -42,11 +50,21 @@ function Navbar() {
           <input
             type="text"
             placeholder="Search videos..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+             if (e.key === "Enter") {
+               handleSearch();
+              }
+            }}
             className="border border-gray-300 rounded-l-full px-4 py-2 w-full outline-none"
           />
 
-          <button className="bg-gray-100 border border-gray-300 px-4 py-3 rounded-r-full hover:bg-gray-200 transition">
-            <FiSearch />
+         <button
+            onClick={handleSearch}
+            className="bg-gray-100 border border-gray-300 px-4 py-3 rounded-r-full hover:bg-gray-200 transition"
+          >
+           <FiSearch />
           </button>
         </div>
 

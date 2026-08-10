@@ -1,9 +1,14 @@
 import api from "./axios";
 
-export const getAllVideos = async () => {
-    const response = await api.get("/videos");
-    return response.data.data;
-};
+export const getAllVideos = async (query = "") => {
+  const response = await api.get("/videos", {
+    params: {
+      query,
+    },
+  });
+
+  return response.data.data;
+ };
 
 export const getVideoById = async (videoId) => {
   const response = await api.get(`/videos/${videoId}`);

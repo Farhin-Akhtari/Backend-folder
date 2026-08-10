@@ -1,19 +1,23 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { getAllVideos } from "../services/videoService";
 import VideoCard from "../components/VideoCard/VideoCard";
 import CategoryBar from "../components/CategoryBar/CategoryBar";
 
 function Home() {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
 
   const [videos, setVideos] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+ 
 
     useEffect(() => {
       const fetchVideos = async () => {
         try {
-          const response = await getAllVideos();
+          const response = await getAllVideos(searchQuery);
 
            console.log("First Videos:", response[0]);
 
@@ -27,7 +31,7 @@ function Home() {
       };
 
        fetchVideos();
-    }, []);
+    }, [searchQuery]);
 
        if (loading) {
     return (
