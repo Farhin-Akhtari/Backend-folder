@@ -133,6 +133,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     {
     $project: {
         title: 1,
+        category: 1,
         "thumbnail.url": 1,
         duration: 1,
         views: 1,
@@ -155,7 +156,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
 //publish video
 const publishVideo = asyncHandler(async (req, res) => {
-    const {title, description} = req.body;
+    const {title, description, category} = req.body;
 
     if (!title?.trim()) {
     throw new ApiError(400, "Title is required");
@@ -163,6 +164,10 @@ const publishVideo = asyncHandler(async (req, res) => {
 
     if (!description?.trim()) {
     throw new ApiError(400, "Description is required");
+    }
+
+   if (!category?.trim()) {
+   throw new ApiError(400, "Category is required");
     }
 
     const videoFile = req.files?.videoFile?.[0]?.path;
@@ -195,6 +200,7 @@ const publishVideo = asyncHandler(async (req, res) => {
         const video = await Video.create({
             title,
             description,
+            category,
     
             videoFile: {
                 url: uploadedVideo.url,
