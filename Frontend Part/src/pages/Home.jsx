@@ -6,6 +6,7 @@ import CategoryBar from "../components/CategoryBar/CategoryBar";
 function Home() {
 
   const [videos, setVideos] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -14,7 +15,7 @@ function Home() {
         try {
           const response = await getAllVideos();
 
-           console.log("Videos:", response);
+           console.log("First Videos:", response[0]);
 
          setVideos(response);
           } catch (err) {
@@ -45,15 +46,25 @@ function Home() {
   }
   console.log("videos state:", videos);
 
+  const filteredVideos =
+  selectedCategory === "All"
+    ? videos
+    : videos.filter(
+        (video) => video.category === selectedCategory
+      );
+
   return (
    <div>
   
     {/*Category bar */}
-      <CategoryBar />
+      <CategoryBar
+       selectedCategory={selectedCategory}
+       setSelectedCategory={setSelectedCategory}
+      />
 
        {/*Video grid*/}
     <div className="grid gap-8 mt-8 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
-       {videos.map((video) => (
+       {filteredVideos.map((video) => (
         <VideoCard
             key={video._id}
             videoId={video._id}

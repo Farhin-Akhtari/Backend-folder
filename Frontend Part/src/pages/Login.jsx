@@ -21,7 +21,7 @@ function Login() {
     });
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
@@ -30,10 +30,13 @@ function Login() {
 
     const response = await loginUser(formData);
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify(response.data.user)
-    );
+    console.log("Login response:", response);
+
+    const user = response.data.user;
+
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("accessToken", response.data.accessToken);
+    localStorage.setItem("refreshToken", response.data.refreshToken);
 
     navigate("/");
   } catch (err) {
