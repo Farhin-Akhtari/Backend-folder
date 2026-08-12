@@ -75,7 +75,7 @@ function MyVideos() {
       ) : (
         <div className="grid gap-8 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
           {videos.map((video) => (
-  <div key={video._id}>
+   <div key={video._id}>
 
     <VideoCard
       videoId={video._id}

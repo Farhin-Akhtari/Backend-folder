@@ -125,7 +125,8 @@ const loggedInUser = await User.findById(user._id).select("-password -refreshTok
 
 const options = {
    httpOnly: true,
-   secure: false
+   secure: false,
+   maxAge: 7 * 24 * 60 * 60 * 1000
 }
 
 return res.status(200)
@@ -154,7 +155,7 @@ const logOutUser = asyncHandler(async (req, res) => {
   )
   const options = {
    httpOnly: true,
-   secure: true
+   secure: false
 }
   return res.status(200)
   .clearCookie("accessToken", options)
