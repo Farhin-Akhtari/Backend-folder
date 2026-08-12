@@ -3,12 +3,15 @@ import { useParams } from "react-router-dom";
 import { getUserChannelProfile } from "../services/authService";
 import { toggleSubscription } from "../services/subscriptionService";
 import { useNavigate } from "react-router-dom";
+import { getAllVideos } from "../services/videoService";
+import VideoCard from "../components/VideoCard/VideoCard";
 
 function Channel() {
   const { username } = useParams();
   const [subscribed, setSubscribed] = useState(false);
   const [subscribersCount, setSubscribersCount] = useState(0);
   const [subscriptionsCount, setSubscriptionsCount] = useState(0);
+  const [videos, setVideos] = useState([]);
 
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,6 +44,9 @@ const handleSubscribe = async () => {
       console.log(response.data);
 
       setChannel(response.data);
+
+      const videoResponse = await getAllVideos("", response.data._id);
+      setVideos(videoResponse);
 
       setSubscribed(response.data.isSubscribed || false);
 
@@ -84,9 +90,9 @@ return (
 
     {/* Cover Image */}
     <div className="h-48 md:h-64 w-full overflow-hidden rounded-b-xl">
-      {channel.coverImage?.url ? (
+      {channel.coverImage? (
         <img
-          src={channel.coverImage.url}
+          src={channel.coverImage}
           alt="Channel cover"
           className="w-full h-full object-cover"
         />
@@ -101,9 +107,9 @@ return (
       <div className="flex items-center gap-5 mt-6">
 
         {/* Avatar */}
-        {channel.avatar?.url ? (
+        {channel.avatar? (
           <img
-            src={channel.avatar.url}
+            src={channel.avatar}
             alt={channel.username}
             className="w-24 h-24 rounded-full object-cover"
           />
@@ -161,6 +167,27 @@ return (
         </button>
 
       </div>
+
+      {/* Channel Videos */}
+    <div className="px-6 mt-10">
+      <h2 className="text-2xl font-bold mb-6">
+         Videos
+     </h2>
+
+  <div className="grid gap-8 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
+    {videos.map((video) => (
+      <VideoCard
+        key={video._id}
+        videoId={video._id}
+        title={video.title}
+        channel={video.owner?.username}
+        views={video.views}
+        thumbnail={video.thumbnail?.url}
+        duration={video.duration}
+      />
+     ))}
+   </div>
+ </div>
 
     </div>
 
