@@ -94,16 +94,45 @@ const getUserChannelSubscription = asyncHandler(async (req, res) => {
 
 //get subscribed channel
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-    const subscribedChannels  = await Subscription.find({
-        subscriber: req.user._id,
-    }).populate("channel", "fullName username avatar")
+  const { channelId } = req.query;
 
-    return res
+  let subscriberId = req.user._id;
+
+  // If channelId is provided, get subscriptions
+  // of that channel/user instead.
+  if (channelId) {
+    if (!isValidObjectId(channelId)) {
+      throw new ApiError(400, "INVALID CHANNEL ID");
+    }
+
+    const user = await User.findById(channelId);
+
+    if (!user) {
+      throw new ApiError(404, "USER NOT FOUND");
+    }
+
+    subscriberId = user._id;
+  }
+
+  const subscribedChannels = await Subscription.find({
+    subscriber: subscriberId,
+  }).populate(
+    "channel",
+    "fullName username avatar"
+  );
+
+  return res
     .status(200)
-    .json(new ApiResponse(200,
-         {subscribedChannels , totalChannelSubscribed: subscribedChannels .length},
-        "SUBSCRIBED CHANNELS FETCHED SUCCESSFULLY"))
-
-})
+    .json(
+      new ApiResponse(
+        200,
+        {
+          subscribedChannels,
+          totalChannelSubscribed: subscribedChannels.length,
+        },
+        "SUBSCRIBED CHANNELS FETCHED SUCCESSFULLY"
+      )
+    );
+});
 
 export {toggleSubscription, getUserChannelSubscription, getSubscribedChannels}

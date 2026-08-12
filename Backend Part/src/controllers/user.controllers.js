@@ -331,70 +331,84 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
  if(!username?.trim()){
    throw new ApiError(400, "username is missing")
  }
-
  //using aggregation pipeine
 
  const channel = await User.aggregate([
-   {
-      $match: {
-         username: username?.toLowerCase()
-      }
-   },
-   {
-      $lookup: {
-         from: "subscriptions",
-         localField: "_id",
-         foreignField: "channel",
-         as: "subscribedTo"
-      }
-   },
-   {
-      $lookup: {
-         from: "subscriptions",
-         localField: "_id",
-         foreignField: "subscriber",
-         as: "subscribers"
-      }
-   },
-   {
-      $addFields: {
-         subscribersCount: {
-            $size: "$subscribers"
-         },
-          channelSubscribedToCount: {
-             $size: "$subscribedTo"
-         },
-         isSubscribed: {
-            $cond: {
-               if: {$in: [req.user?._id, "$subscribers.subscriber"]},
-               then: true,
-               else: false
-            }
-         }
-      }
-   },
-   {
-      $project: {
-         fullName: 1,
-         username: 1,
-         subscribersCount: 1,
-         channelSubscribedToCount: 1,
-         isSubscribed: 1,
-         avatar: 1,
-         coverImage: 1,
-         email: 1
-      }
-   }
- ])
+  {
+    $match: {
+      username: username?.toLowerCase()
+    }
+  },
 
- if(!channel?.length){
-   throw new ApiError(404, "channel does not exists")
- }
+  // People who subscribed to this channel
+  {
+    $lookup: {
+      from: "subscriptions",
+      localField: "_id",
+      foreignField: "channel",
+      as: "subscribers"
+    }
+  },
 
- return res
- .status(200)
- .json(new ApiResponse(200, channel[0], "user channel fetched successfuly"))
+  // Channels this user subscribed to
+  {
+    $lookup: {
+      from: "subscriptions",
+      localField: "_id",
+      foreignField: "subscriber",
+      as: "subscriptions"
+    }
+  },
 
+  {
+    $addFields: {
+      subscribersCount: {
+        $size: "$subscribers"
+      },
+
+      subscriptionsCount: {
+        $size: "$subscriptions"
+      },
+
+      isSubscribed: {
+        $cond: {
+          if: {
+            $in: [req.user?._id, "$subscribers.subscriber"]
+          },
+          then: true,
+          else: false
+        }
+      }
+    }
+  },
+
+  {
+    $project: {
+      fullName: 1,
+      username: 1,
+      subscribersCount: 1,
+      subscriptionsCount: 1,
+      isSubscribed: 1,
+      avatar: 1,
+      coverImage: 1,
+      email: 1
+    }
+  }
+ ]);
+
+ if (!channel?.length) {
+  throw new ApiError(404, "channel does not exist");
+}
+
+return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      channel[0],
+      "user channel fetched successfully"
+    )
+  );
 })
 
 const getWatchHistory = asyncHandler(async (req, res) => {
