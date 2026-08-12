@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { publishVideo } from "../services/videoService";
+import { useNavigate } from "react-router-dom";
 
 function UploadVideo() {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Programming");
@@ -33,6 +35,8 @@ function UploadVideo() {
       const response = await publishVideo(formData);
 
       console.log("Video published:", response);
+
+       navigate("/my-videos");
 
     } catch (error) {
       console.error("Failed to publish video:", error);

@@ -98,6 +98,38 @@ function Navbar() {
                     {user.username}
                   </p>
 
+                  {/* My Channel */}
+                   <button
+                    onClick={() => {
+                    navigate(`/channel/${user.username}`);
+                    setShowMenu(false);
+                   }}
+                   className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+                  >
+                    My Channel
+                  </button>
+ 
+                  {/* Upload Video*/}
+                  <button
+                    onClick={() => {
+                     navigate("/upload");
+                     setShowMenu(false);
+                    }}
+                   className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+                  >
+                    Upload Video
+                  </button>
+
+                   <button
+                     onClick={() => {
+                       navigate("/my-videos");
+                       setShowMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+                    >
+                      My Videos
+                    </button>
+
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-red-500"
