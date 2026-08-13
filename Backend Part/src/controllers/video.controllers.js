@@ -64,6 +64,10 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
     const skip = (pageNumber - 1) * limitNumber;
 
+    const loggedInUserId  = req.user?._id
+  ? new mongoose.Types.ObjectId(req.user._id)
+  : null;
+
   const video = await Video.aggregate([
     {
         $match: matchConditions
@@ -110,10 +114,24 @@ const getAllVideos = asyncHandler(async (req, res) => {
         }
     },
     {
+       $lookup: {
+         from: "users",
+         localField: "_id",
+         foreignField: "watchLater",
+         as: "watchLaterUsers"
+        }
+    },
+    {
         $addFields: {
             owner: {
                 $first: "$ownerDetails"
             },
+            isWatchLater: loggedInUserId 
+            ? {
+             $in: [loggedInUserId , "$watchLaterUsers._id"]
+              }
+            : false,
+        
             likesCount: {
                 $size: "$likes"
             },
@@ -141,6 +159,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
         owner: 1,
         likesCount: 1,
         isLiked: 1,
+        isWatchLater: 1,
         commentsCount: 1
         }
     }
@@ -253,6 +272,21 @@ const getVideoById = asyncHandler(async (req, res) => {
          }
     );
 
+   if (req.user?._id) {
+  console.log("Adding video to watch history...");
+
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $addToSet: {
+        watchHistory: videoId
+      }
+    }
+  );
+
+  console.log("Watch history updated!");
+ }
+
      const userId = req.user?._id
     ? new mongoose.Types.ObjectId(req.user._id) : null;
 
@@ -322,6 +356,14 @@ const getVideoById = asyncHandler(async (req, res) => {
             }
         },
         {
+         $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "watchLater",
+          as: "watchLaterUsers"
+         }
+        },
+        {
             $addFields: {
                 likesCount: {
                     $size: "$likes"
@@ -338,7 +380,13 @@ const getVideoById = asyncHandler(async (req, res) => {
                    $in: 
                    [userId, "$likes.likedBy"],
                     }
-                    :false
+                    :false,
+
+                isWatchLater: userId
+                 ? {
+                    $in: [userId, "$watchLaterUsers._id"]
+                   }
+                   : false
             }
         },
         {
@@ -353,6 +401,7 @@ const getVideoById = asyncHandler(async (req, res) => {
                 owner: 1,
                 likesCount: 1,
                 isLiked: 1,
+                isWatchLater: 1,
                 isPublished: 1,
                 commentsCount: 1
             }

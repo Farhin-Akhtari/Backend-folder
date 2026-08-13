@@ -1,10 +1,11 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/ApiError.js"
 import {User} from "../models/user.models.js"
+import {Video} from "../models/video.models.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 
 const generateAccessAndRefreshTokens = async(userId) => {
    try {
@@ -461,6 +462,127 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 
 })
 
+const getWatchLater = asyncHandler(async (req, res) => {
+
+   const user = await User.aggregate([
+      {
+         $match: {
+            _id: new mongoose.Types.ObjectId(req.user._id)
+         }
+      },
+      {
+      $lookup: {
+        from: "videos",
+        localField: "watchLater",
+        foreignField: "_id",
+        as: "watchLater",
+        pipeline: [
+          {
+            $lookup: {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline: [
+                {
+                  $project: {
+                    username: 1,
+                    fullName: 1,
+                    "avatar.url": 1
+                  }
+                }
+              ]
+            }
+          },
+          {
+            $addFields: {
+              owner: {
+                $first: "$owner"
+              }
+            }
+          },
+          {
+            $project: {
+              title: 1,
+              thumbnail: 1,
+              duration: 1,
+              views: 1,
+              createdAt: 1,
+              owner: 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        watchLater: 1
+      }
+    }
+  ]);
+ 
+  return res
+  .status(200)
+  .json(new ApiResponse(200, user[0].watchLater || [], "WATCH LATER VIDEOS FETCHED SUCCESSFULLY"));
+
+})
+
+const toggleWatchLater = asyncHandler(async (req, res) => {
+   const {videoId} = req.params;
+
+   if(!isValidObjectId(videoId)){
+       throw new ApiError(400, "INVALID VIDEO ID");
+   }
+
+   const video = await Video.findById(videoId);
+   if(!video){
+       throw new ApiError(404, "VIDEO NOT FOUND");
+   }
+
+   const user = await User.findById(req.user._id);
+   
+   const alreadySaved = user.watchLater.includes(videoId);
+
+   if(alreadySaved){
+      await User.findByIdAndUpdate(req.user._id,
+         {
+            $pull: {
+               watchLater: videoId
+            }
+         }
+      );
+       return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { watchLater: false },
+          "Video removed from watch later"
+        )
+      );
+   }
+    await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $addToSet: {
+        watchLater: videoId
+      }
+    }
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { watchLater: true },
+        "Video added to watch later"
+      )
+    );
+});
+
+
 export { registerUser, 
          loginUser,
          logOutUser,
@@ -471,5 +593,7 @@ export { registerUser,
          UpdateUserAvatar,
          UpdateUserCoverImage,
          getUserChannelProfile,
-         getWatchHistory
+         getWatchHistory,
+         getWatchLater,
+         toggleWatchLater
        }
