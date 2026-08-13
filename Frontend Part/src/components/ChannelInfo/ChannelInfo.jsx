@@ -2,9 +2,17 @@ function ChannelInfo({ video, subscribersCount }) {
   return (
     <div className="flex items-center gap-3">
       {/* Avatar */}
-      <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-semibold">
-        R
-      </div>
+      {video.owner?.avatar?.url ? (
+  <img
+    src={video.owner.avatar.url}
+    alt={video.owner.username}
+    className="w-12 h-12 rounded-full object-cover"
+  />
+) : (
+  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center font-semibold">
+    {video.owner?.username?.[0]?.toUpperCase()}
+  </div>
+)}
 
       {/* Channel Details */}
       <div>

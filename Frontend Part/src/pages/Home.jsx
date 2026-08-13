@@ -77,6 +77,8 @@ function Home() {
             views={video.views}
             thumbnail={video.thumbnail?.url}
             duration={video.duration}
+            isWatchLater={video.isWatchLater}
+            ownerAvatar={video.owner?.avatar?.url}
         />
      ))}
     </div>

@@ -10,6 +10,7 @@ import VideoInfo from "../components/VideoInfo/VideoInfo";
 import ChannelInfo from "../components/ChannelInfo/ChannelInfo";
 import VideoActions from "../components/VideoActions/VideoActions";
 import CommentForm from "../components/CommentForm/CommentForm";
+import { toggleWatchLater } from "../services/watchLaterService";
 
 function VideoDetails() {
   const { videoId } = useParams();
@@ -30,11 +31,14 @@ function VideoDetails() {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingText, setEditingText] = useState("");
 
+  const [watchLater, setWatchLater] = useState(false);
+
   //for login
 const loggedInUser = JSON.parse(localStorage.getItem("user"));
 
 const fetchedVideoId = useRef(null);
 
+//for video fetch
   useEffect(() => {
    if (fetchedVideoId.current === videoId) return;
 
@@ -54,6 +58,8 @@ const fetchedVideoId = useRef(null);
       setLiked(response.data.isLiked || false);
       setLikesCount(response.data.likesCount || 0);
 
+      setWatchLater(response.data.isWatchLater || false);
+
     } catch (err) {
       console.error(err);
       setError("Failed to fetch video");
@@ -65,7 +71,7 @@ const fetchedVideoId = useRef(null);
   fetchVideo();
 }, [videoId]);
 
-//For comments
+//For comments fetch
 useEffect(() => {
   const fetchComments = async () => {
     try {
@@ -211,6 +217,19 @@ const handleEditComment = async (commentId) => {
   }
  };
 
+ //ADD TOGGLE WATCH LATER
+ const handleWatchLater = async () => {
+  try {
+    const response = await toggleWatchLater(videoId);
+
+    const isSaved = response.data.watchLater;
+
+    setWatchLater(isSaved);
+  } catch (err) {
+    console.error("Watch Later failed:", err);
+  }
+};
+
   if (loading) {
     return <h2 className="text-center text-xl mt-10">Loading...</h2>;
   }
@@ -255,10 +274,12 @@ const handleEditComment = async (commentId) => {
 
     {/* Video Actions */}
     <VideoActions
-      liked={liked}
-      likesCount={likesCount}
-      onLike={handleLike}
-    />
+  liked={liked}
+  likesCount={likesCount}
+  onLike={handleLike}
+  watchLater={watchLater}
+  onWatchLater={handleWatchLater}
+/>
 
     {/* Comment Section */}
     <div className="mt-8">

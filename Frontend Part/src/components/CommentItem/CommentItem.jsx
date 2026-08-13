@@ -22,9 +22,17 @@ function CommentItem({
   return (
     <div className="flex gap-3">
       {/* Avatar */}
-      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-semibold">
-        F
-      </div>
+     {comment.owner?.avatar?.url ? (
+  <img
+    src={comment.owner.avatar.url}
+    alt={comment.owner.username}
+    className="w-10 h-10 rounded-full object-cover"
+  />
+) : (
+  <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-semibold">
+    {comment.owner?.username?.[0]?.toUpperCase()}
+  </div>
+)}
 
       <div className="flex-1">
         {/* Username */}

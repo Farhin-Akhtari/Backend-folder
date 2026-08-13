@@ -20,3 +20,8 @@ export const getChannelSubscriptions = async (channelId) => {
 
   return response.data;
 };
+
+export const getSubscribedChannels = async () => {
+  const response = await api.get("/subscriptions");
+  return response.data;
+};
