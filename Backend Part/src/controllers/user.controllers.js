@@ -143,27 +143,48 @@ return res.status(200)
 })
 
 const logOutUser = asyncHandler(async (req, res) => {
-  await User.findByIdAndUpdate(
-   req.user._id,
-   {
-      $unset: {
-         refreshToken: 1
-      }
-   },
-   {
-         new: true
-      }
-  )
-  const options = {
-   httpOnly: true,
-   secure: false
-}
-  return res.status(200)
-  .clearCookie("accessToken", options)
-  .clearCookie("refreshToken", options)
-  .json(new ApiResponse(200, {}, "User logged out successfully"))
+    const incomingRefreshToken =
+        req.cookies?.refreshToken || req.body?.refreshToken;
 
-})
+    if (incomingRefreshToken) {
+        try {
+            const decodedToken = jwt.verify(
+                incomingRefreshToken,
+                process.env.REFRESH_TOKEN_SECRET
+            );
+
+            await User.findByIdAndUpdate(
+                decodedToken?._id,
+                {
+                    $unset: {
+                        refreshToken: 1
+                    }
+                }
+            );
+        } catch (error) {
+            // Even if refresh token is expired,
+            // we still want to clear the browser cookies.
+            console.log("Refresh token invalid/expired during logout");
+        }
+    }
+
+    const options = {
+        httpOnly: true,
+        secure: false,
+    };
+
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "User logged out successfully"
+            )
+        );
+});
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
  const incomingRefreshToken = req.cookies.refreshToken ||
