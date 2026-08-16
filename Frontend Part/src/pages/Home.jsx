@@ -67,21 +67,25 @@ function Home() {
       />
 
        {/*Video grid*/}
-    <div className="grid gap-8 mt-8 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
-       {filteredVideos.map((video) => (
-        <VideoCard
-            key={video._id}
-            videoId={video._id}
-            title={video.title}
-            channel={video.owner?.username}
-            views={video.views}
-            thumbnail={video.thumbnail?.url}
-            duration={video.duration}
-            isWatchLater={video.isWatchLater}
-            ownerAvatar={video.owner?.avatar?.url}
-        />
-     ))}
-    </div>
+    <div className="grid gap-8 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
+    {filteredVideos.length > 0 ? (
+     filteredVideos.map((video) => (
+    <VideoCard
+      key={video._id}
+      videoId={video._id}
+      title={video.title}
+      channel={video.owner?.username}
+      views={video.views}
+      thumbnail={video.thumbnail?.url}
+      duration={video.duration}
+    />
+   ))
+  ) : (
+   <p className="text-gray-500">
+     No videos found.
+   </p>
+ )}
+ </div>
     
     </div>
 

@@ -11,6 +11,13 @@ function VideoCard({
 }) {
   const navigate = useNavigate();
 
+  const formatDuration = (duration) => {
+  const minutes = Math.floor(duration / 60);
+  const seconds = Math.floor(duration % 60);
+
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+ };
+
   return (
     <div
       onClick={() => navigate(`/videos/${videoId}`)}
@@ -25,12 +32,19 @@ function VideoCard({
         />
 
         <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-          {duration}
+          {formatDuration(duration)}
         </span>
       </div>
 
       {/* Video Information */}
       <div className="flex items-start gap-3 p-4">
+        <div
+    onClick={(e) => {
+      e.stopPropagation();
+      navigate(`/channel/${channel}`);
+    }}
+    className="cursor-pointer"
+  >
 
         {/* Avatar */}
        {ownerAvatar ? (
@@ -43,7 +57,8 @@ function VideoCard({
     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 font-semibold">
        {channel?.[0]?.toUpperCase()}
      </div>
-)}
+    )}
+   </div>
 
         {/* Details */}
         <div className="flex flex-1 min-w-0">
@@ -53,9 +68,18 @@ function VideoCard({
               {title}
             </h3>
 
-            <p className="text-sm text-gray-600">
-              {channel} • {views} views
-            </p>
+          <p className="text-sm text-gray-600">
+              <span
+             onClick={(e) => {
+             e.stopPropagation();
+             navigate(`/channel/${channel}`);
+            }}
+            className="hover:underline cursor-pointer"
+            >
+            {channel}
+            </span>{" "}
+            • {views} views
+          </p>
           </div>
 
         </div>

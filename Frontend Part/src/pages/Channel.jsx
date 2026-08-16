@@ -174,6 +174,7 @@ return (
          Videos
      </h2>
 
+ {videos.length > 0 ? (
   <div className="grid gap-8 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
     {videos.map((video) => (
       <VideoCard
@@ -185,8 +186,13 @@ return (
         thumbnail={video.thumbnail?.url}
         duration={video.duration}
       />
-     ))}
-   </div>
+    ))}
+  </div>
+) : (
+  <p className="text-gray-500">
+    This channel hasn't uploaded any videos yet.
+  </p>
+)}
  </div>
 
     </div>
