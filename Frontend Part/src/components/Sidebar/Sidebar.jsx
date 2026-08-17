@@ -6,6 +6,7 @@ import {
   MdHistory,
   MdWatchLater,
   MdVideoLibrary,
+  MdPlaylistPlay,
 } from "react-icons/md";
 import { SiYoutubeshorts } from "react-icons/si";
 import { AiFillLike } from "react-icons/ai";
@@ -53,6 +54,11 @@ function Sidebar() {
       name: "Watch Later",
       icon: <MdWatchLater />,
       path: "/watch-later",
+    },
+    {
+    name: "Playlists",
+    icon: <MdPlaylistPlay />,
+    path: "/playlists",
     },
     {
       name: "Liked Videos",

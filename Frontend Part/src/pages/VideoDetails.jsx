@@ -11,6 +11,7 @@ import ChannelInfo from "../components/ChannelInfo/ChannelInfo";
 import VideoActions from "../components/VideoActions/VideoActions";
 import CommentForm from "../components/CommentForm/CommentForm";
 import { toggleWatchLater } from "../services/watchLaterService";
+import { getUserPlaylists, addVideoToPlaylist } from "../services/playlistService";
 
 function VideoDetails() {
   const { videoId } = useParams();
@@ -32,6 +33,10 @@ function VideoDetails() {
   const [editingText, setEditingText] = useState("");
 
   const [watchLater, setWatchLater] = useState(false);
+  const [playlists, setPlaylists] = useState([]);
+  const [showPlaylistMenu, setShowPlaylistMenu] = useState(false);
+  const [playlistMessage, setPlaylistMessage] = useState("");
+  const [playlistMessageType, setPlaylistMessageType] = useState("");
 
   //for login
 const loggedInUser = JSON.parse(localStorage.getItem("user"));
@@ -70,6 +75,25 @@ const fetchedVideoId = useRef(null);
 
   fetchVideo();
 }, [videoId]);
+
+//for playlist fetch
+useEffect(() => {
+  const fetchPlaylists = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!user?._id) return;
+
+      const response = await getUserPlaylists(user._id);
+
+      setPlaylists(response.data);
+    } catch (err) {
+      console.error("Failed to fetch playlists:", err);
+    }
+  };
+
+  fetchPlaylists();
+}, []);
 
 //For comments fetch
 useEffect(() => {
@@ -230,6 +254,39 @@ const handleEditComment = async (commentId) => {
   }
 };
 
+//ADD HANDLE PLAYLIST
+const handleAddToPlaylist = async (playlistId) => {
+  try {
+    const response = await addVideoToPlaylist(
+      playlistId,
+      videoId
+    );
+
+    console.log("Video added to playlist:", response);
+
+    setPlaylistMessage("Video added to playlist successfully!");
+    setPlaylistMessageType("success");
+
+    setShowPlaylistMenu(false);
+    setTimeout(() => {
+    setPlaylistMessage("");
+    }, 3000);
+
+  } catch (err) {
+    console.error("Failed to add video to playlist:", err);
+
+    setPlaylistMessage(
+      err.response?.data?.message || "Failed to add video to playlist"
+    );
+    setPlaylistMessageType("error");
+
+    setShowPlaylistMenu(false);
+    setTimeout(() => {
+    setPlaylistMessage("");
+    }, 3000);
+  }
+};
+
   if (loading) {
     return <h2 className="text-center text-xl mt-10">Loading...</h2>;
   }
@@ -280,6 +337,55 @@ const handleEditComment = async (commentId) => {
   watchLater={watchLater}
   onWatchLater={handleWatchLater}
 />
+
+ {/* Playlist Section */}
+ <div className="relative mt-4">
+  <button
+    onClick={() => setShowPlaylistMenu(!showPlaylistMenu)}
+    className="px-4 py-2 rounded-lg border font-medium hover:bg-gray-100 transition"
+  >
+    + Add to Playlist
+  </button>
+
+  {showPlaylistMenu && (
+    <div className="absolute left-0 mt-2 w-64 bg-white border rounded-xl shadow-lg z-20">
+      {playlists.length === 0 ? (
+        <p className="p-4 text-gray-500">
+          You don't have any playlists.
+        </p>
+      ) : (
+        <div className="py-2">
+          {playlists.map((playlist) => (
+            <button
+              key={playlist._id}
+              onClick={() => handleAddToPlaylist(playlist._id)}
+              className="w-full text-left px-4 py-3 hover:bg-gray-200 transition"
+            >
+              <p className="font-medium">
+                {playlist.name}
+              </p>
+
+              <p className="text-sm text-gray-500">
+                {playlist.videoCount} videos
+              </p>
+            </button>
+          ))}
+        </div>
+      )}
+       {playlistMessage && (
+       <p
+        className={`mt-3 text-sm ${
+        playlistMessageType === "success"
+        ? "text-green-600"
+        : "text-red-600"
+      }`}
+      >
+      {playlistMessage}
+    </p>
+  )}
+    </div>
+  )}
+</div>
 
     {/* Comment Section */}
     <div className="mt-8">
