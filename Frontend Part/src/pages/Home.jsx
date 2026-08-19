@@ -66,6 +66,12 @@ function Home() {
        setSelectedCategory={setSelectedCategory}
       />
 
+    {searchQuery && (
+    <h2 className="text-xl font-semibold mb-6">
+      Search results for: "{searchQuery}"
+   </h2>
+  )}
+
        {/*Video grid*/}
     <div className="grid gap-8 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
     {filteredVideos.length > 0 ? (
