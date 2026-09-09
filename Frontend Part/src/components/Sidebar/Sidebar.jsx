@@ -7,6 +7,7 @@ import {
   MdWatchLater,
   MdVideoLibrary,
   MdPlaylistPlay,
+  MdNotifications,
 } from "react-icons/md";
 import { SiYoutubeshorts } from "react-icons/si";
 import { AiFillLike } from "react-icons/ai";
@@ -49,7 +50,15 @@ function Sidebar() {
   ];
 
   const otherMenuItems = [
-    { name: "History", icon: <MdHistory />, path: "/history" },
+    {
+     name: "Notifications",
+     icon: <MdNotifications />,
+     path: "/notifications",
+    },
+    { name: "History", 
+      icon: <MdHistory />, 
+      path: "/history" 
+    },
     {
       name: "Watch Later",
       icon: <MdWatchLater />,

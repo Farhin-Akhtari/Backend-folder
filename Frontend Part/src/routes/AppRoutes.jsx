@@ -16,6 +16,7 @@ import LikedVideos from "../pages/LikedVideos";
 import WatchLater from "../pages/WatchLater";
 import Playlist from "../pages/Playlist";
 import PlaylistDetails from "../pages/PlaylistDetails";
+import Notifications from "../pages/Notification";
 
 function AppRoutes() {
   return (
@@ -27,6 +28,7 @@ function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/videos/:videoId" element={<VideoDetails/>} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/upload" element={<UploadVideo />} />
           <Route path="/my-videos" element={<MyVideos />} />
           <Route path="/edit-video/:videoId" element={<EditVideo />} />

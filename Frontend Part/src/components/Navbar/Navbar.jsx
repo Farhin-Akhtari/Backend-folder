@@ -1,11 +1,41 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiSearch, FiClock, FiX, FiBell } from "react-icons/fi";
 import { logoutUser } from "../../services/authService.js";
 import { getSearchHistory, addSearchHistory, deleteSearchHistory, clearSearchHistory } from "../../services/searchHistory.js";
 import {getAllVideos} from "../../services/videoService.js"
 import socket from "../../services/socketService.js";
-import { getUserNotification, markNotificationAsRead } from "../../services/notificationService.js";
+import { NotificationContext } from "../../context/NotificationContext.jsx";
+
+const getTimeAgo = (date) => {
+  const seconds = Math.floor(
+    (new Date() - new Date(date)) / 1000
+  );
+
+  if (seconds < 60) {
+    return "Just now";
+  }
+
+  const minutes = Math.floor(seconds / 60);
+
+  if (minutes < 60) {
+    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+
+  if (hours < 24) {
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  }
+
+  const days = Math.floor(hours / 24);
+
+  if (days < 7) {
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  }
+
+  return new Date(date).toLocaleDateString();
+};
 
 function Navbar() {
   const navigate = useNavigate();
@@ -17,7 +47,7 @@ function Navbar() {
 
   const [search, setSearch] = useState("");
   const [searchHistory, setSearchHistory] = useState([]);
-  const [notifications, setNotifications] = useState([]);
+  const {notifications, setNotifications, markAsRead} = useContext(NotificationContext);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearchHistory, setShowSearchHistory] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
@@ -77,24 +107,6 @@ useEffect(() => {
 
   return () => clearTimeout(timer);
 }, [search]);
-
-useEffect(() => {
-  const fetchNotifications = async () => {
-    try {
-      const response = await getUserNotification();
-
-      console.log("Notifications:", response.data);
-
-      setNotifications(response.data || []);
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-    }
-  };
-
-  if (user?._id) {
-    fetchNotifications();
-  }
-}, [user?._id]);
 
 //SET SOCKET USEEFFECT
 useEffect(() => {
@@ -194,20 +206,8 @@ const handleClearHistory = async () => {
 
 const handleNotificationClick = async (notification) => {
   try {
-    // Mark notification as read
-    if (!notification.isRead) {
-      await markNotificationAsRead(notification._id);
+    await markAsRead(notification._id);
 
-      setNotifications((prev) =>
-        prev.map((item) =>
-          item._id === notification._id
-            ? { ...item, isRead: true }
-            : item
-        )
-      );
-    }
-
-    // Comment / Like → open video
     if (
       notification.type === "comment" ||
       notification.type === "like"
@@ -217,14 +217,12 @@ const handleNotificationClick = async (notification) => {
       }
     }
 
-    // Subscribe → open subscriber's channel
     if (notification.type === "subscribe") {
       if (notification.sender?.username) {
         navigate(`/channel/${notification.sender.username}`);
       }
     }
 
-    // Close notification dropdown
     setShowNotifications(false);
 
   } catch (error) {
@@ -494,6 +492,10 @@ const unreadCount = notifications.filter(
         New
       </p>
     )}
+
+    <p className="text-xs text-gray-400 mt-2">
+     {getTimeAgo(notification.createdAt)}
+    </p>
 
   </div>
 

@@ -1,8 +1,11 @@
 import AppRoutes from "./routes/AppRoutes";
+import { NotificationProvider } from "./context/NotificationContext.jsx";
 
 function App() {
   return (
-    <AppRoutes/>
+    <NotificationProvider>
+      <AppRoutes />
+    </NotificationProvider>
   );
 }
 

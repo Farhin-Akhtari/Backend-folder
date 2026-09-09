@@ -33,6 +33,7 @@ const markNotificationAsRead = asyncHandler(async (req, res) => {
 const getUserNotification = asyncHandler(async (req, res) => {
     const notifications = await Notification.find({
         recipient: req.user._id,
+        isRead: false
     })
     .populate("sender", "username fullName avatar")
     .populate("video", "title thunbnail")

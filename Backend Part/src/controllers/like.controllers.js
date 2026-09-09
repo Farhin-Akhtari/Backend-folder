@@ -93,7 +93,6 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
 })
 
-
 //Toggle comment likes
 const toggleCommentLike = asyncHandler(async (req, res) => {
     const {commentId} = req.params;
