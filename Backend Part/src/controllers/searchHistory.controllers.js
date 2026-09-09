@@ -53,6 +53,7 @@ const getSearchHistory = asyncHandler(async (req, res) => {
   const searchHistory = await SearchHistory.find(
    { user: req.user._id}
   ).sort({createdAt: -1});
+  console.log("Logged in user:", req.user._id);
 
   return res
   .status(200)

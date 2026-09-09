@@ -6,6 +6,8 @@ import { User } from "../models/user.models.js";
 import { Video } from "../models/video.models.js"
 import { Comment } from "../models/comment.models.js"
 import { Like } from "../models/like.models.js"
+import {Notification} from "../models/notification.models.js"
+import { getSocketIO } from "../utils/socket.js";
 
 
 //get video comments
@@ -124,6 +126,41 @@ const createComment = asyncHandler(async (req, res) => {
         owner: req.user._id
     })
 
+    //AUTHORIZATION 
+    if(video.owner.toString() !== req.user._id.toString()){
+
+    // CREATE NOTIFICATION
+  const notification = await Notification.create({
+    recipient: video.owner,
+    sender: req.user._id,
+    type: "comment",
+    video: videoId,
+    comment: comment._id,
+  });
+
+// GET Socket.IO instance
+const io = getSocketIO();
+
+console.log(
+    "Sending notification to:",
+    video.owner.toString()
+);
+
+// Populate notification
+const populatedNotification = await Notification.findById(notification._id)
+    .populate("sender", "username fullName avatar")
+    .populate("video", "title thumbnail")
+    .populate("comment", "content");
+
+// SEND REAL-TIME NOTIFICATION
+  if (io) {
+    io.to(video.owner.toString()).emit(
+        "newNotification",
+        populatedNotification
+    );
+  }
+}
+
     const checkComment = await Comment.findById(comment._id)
     .populate("owner", "username fullName avatar");
 
@@ -162,6 +199,23 @@ const deleteComment = asyncHandler(async (req, res) => {
      if(!deleted){
          throw new ApiError(500, "FAILED TO DELETE COMMENT");
      }
+
+    const notification = await Notification.findOne({
+       comment: commentId
+    })
+
+     await Notification.deleteMany({
+      comment: commentId
+    })
+
+    //send real-time notification deleteion
+    const io = getSocketIO();
+
+    if(io && notification){
+        io.to(video.owner.toString()).emit(
+            "notificationDeleted", notification._id
+        )
+    }
 
     return res
     .status(200)

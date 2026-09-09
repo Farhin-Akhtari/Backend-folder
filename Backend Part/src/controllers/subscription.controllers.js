@@ -4,8 +4,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.models.js";
 import { Subscription } from "../models/subscription.models.js";
-import {uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js"
-
+import { Notification } from "../models/notification.models.js";
+import { getSocketIO } from "../utils/socket.js";
 
 //toggle subscription
 //STEPS: 
@@ -45,6 +45,25 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
     if(existingSubscription){
         await Subscription.findByIdAndDelete(existingSubscription._id);
+
+      const notification = await Notification.findOne({
+       recipient: channelId,
+       sender: req.user._id,
+       type: "subscribe"
+      });
+
+      if(notification){
+        await Notification.findByIdAndDelete(notification._id)
+      }
+
+      const io = getSocketIO();
+
+       if(io && notification){
+        io.to(channelId.toString()).emit(
+          "notificationDeleted", notification._id.toString()
+        )
+       }
+
         return res.status(200).json(
         new ApiResponse(
             200,
@@ -52,7 +71,6 @@ const toggleSubscription = asyncHandler(async (req, res) => {
             "Unsubscribed successfully"
         )
     );
-
     }else{
         const newSubscription = await Subscription.create({
              subscriber: req.user._id,
@@ -62,6 +80,32 @@ const toggleSubscription = asyncHandler(async (req, res) => {
             throw new ApiError(500, "FAILED TO SUBSCRIBE")
         }
     }
+   const existingNotification = await Notification.findOne({
+    recipient: channelId,
+    sender: req.user._id,
+    type: "subscribe"
+  });
+
+  if (!existingNotification) {
+    const notification = await Notification.create({
+        recipient: channelId,
+        sender: req.user._id,
+        type: "subscribe"
+      });
+    
+    const io = getSocketIO();
+
+    const populatedNotification = await Notification.findById(notification._id)
+        .populate("sender", "username fullName avatar");
+
+    if (io) {
+        io.to(channelId.toString()).emit(
+            "newNotification",
+            populatedNotification
+        );
+    }
+  }
+
     return res
     .status(200)
     .json(new ApiResponse(200, { subscribed: true}, "Subscription successfully."))

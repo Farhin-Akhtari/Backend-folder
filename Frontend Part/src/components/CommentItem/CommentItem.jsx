@@ -90,7 +90,7 @@ function CommentItem({
               {isCommentOwner && (
                 <button
                   onClick={() => onEdit(comment)}
-                  className="text-sm text-blue-500"
+                  className="text-sm text-blue-500 hover:underline"
                 >
                   Edit
                 </button>
@@ -99,7 +99,7 @@ function CommentItem({
               {(isCommentOwner || isVideoOwner) && (
                 <button
                   onClick={() => onDelete(comment._id)}
-                  className="text-sm text-red-500"
+                  className="text-sm text-red-500 hover:underline"
                 >
                   Delete
                 </button>

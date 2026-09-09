@@ -7,6 +7,8 @@ import { Video } from "../models/video.models.js"
 import { Comment } from "../models/comment.models.js"
 import { Like } from "../models/like.models.js"
 import { Tweet } from "../models/tweet.models.js";
+import { Notification } from "../models/notification.models.js";
+import { getSocketIO } from "../utils/socket.js";
 
 //Toggle video likes
 const toggleVideoLike = asyncHandler(async (req, res) => {
@@ -27,6 +29,29 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
     if(existingLike){
         await Like.findByIdAndDelete(existingLike._id);
+
+         // Find notification related to this like
+    const notification = await Notification.findOne({
+        recipient: video.owner,
+        sender: req.user._id,
+        type: "like",
+        video: videoId
+    });
+
+    // Delete the notification
+    if(notification){
+        await Notification.findByIdAndDelete(notification._id);
+    }
+
+    // Send real-time deletion
+    const io = getSocketIO();
+
+    if(io && notification){
+        io.to(video.owner.toString()).emit(
+            "notificationDeleted",
+            notification._id.toString()
+        );
+    }
         
         return res
         .status(200)
@@ -38,11 +63,36 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
         likedBy: req.user._id
     })
 
+    if(video.owner.toString() !== req.user._id.toString()){
+
+    const notification = await Notification.create({
+    recipient: video.owner,
+    sender: req.user._id,
+    type: "like",
+    video: videoId,
+    });
+
+    const io = getSocketIO();
+
+    // Populate notification
+    const populatedNotification = await Notification.findById(notification._id)
+        .populate("sender", "username fullName avatar")
+        .populate("video", "title thumbnail")
+
+    if(io){
+        io.to(video.owner.toString()).emit(
+            "newNotification",
+            populatedNotification
+        );
+    }
+}
+
      return res
      .status(200)
      .json(new ApiResponse(200, {liked: true}, "video liked successfully"));
 
 })
+
 
 //Toggle comment likes
 const toggleCommentLike = asyncHandler(async (req, res) => {

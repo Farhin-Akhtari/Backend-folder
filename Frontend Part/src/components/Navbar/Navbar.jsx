@@ -1,25 +1,236 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiSearch } from "react-icons/fi";
-import { logoutUser } from "../../services/authService";
+import { FiSearch, FiClock, FiX, FiBell } from "react-icons/fi";
+import { logoutUser } from "../../services/authService.js";
+import { getSearchHistory, addSearchHistory, deleteSearchHistory, clearSearchHistory } from "../../services/searchHistory.js";
+import {getAllVideos} from "../../services/videoService.js"
+import socket from "../../services/socketService.js";
+import { getUserNotification, markNotificationAsRead } from "../../services/notificationService.js";
 
 function Navbar() {
   const navigate = useNavigate();
+  const searchRef = useRef(null);
 
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("user"))
   );
 
   const [search, setSearch] = useState("");
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSearchHistory, setShowSearchHistory] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
 
   const [showMenu, setShowMenu] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
 
-  const handleSearch = () => {
+
+  useEffect(() => {
+    const fetchSearchHistory = async () => {
+      try {
+        const response = await getSearchHistory();
+        setSearchHistory(response.data);
+       
+      }catch(error){
+        console.error("Failed to fetch search history:", error);
+      }
+    };
+    fetchSearchHistory();
+  }, [])
+
+  useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (searchRef.current && !searchRef.current.contains(event.target)) {
+      setShowSearchHistory(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
+useEffect(() => {
+  const fetchSuggestions = async () => {
+    if (!search.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      const response = await getAllVideos(search.trim());
+      console.log("Suggestions response:", response);
+
+      setSuggestions(response || []);
+    } catch (error) {
+      console.error("Failed to fetch suggestions:", error);
+      setSuggestions([]);
+    }
+  };
+
+  const timer = setTimeout(() => {
+    fetchSuggestions();
+  }, 300);
+
+  return () => clearTimeout(timer);
+}, [search]);
+
+useEffect(() => {
+  const fetchNotifications = async () => {
+    try {
+      const response = await getUserNotification();
+
+      console.log("Notifications:", response.data);
+
+      setNotifications(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    }
+  };
+
+  if (user?._id) {
+    fetchNotifications();
+  }
+}, [user?._id]);
+
+//SET SOCKET USEEFFECT
+useEffect(() => {
+  if(!user?._id) return;
+
+  socket.on("connect", () => {
+    console.log("Connected to socket:", socket.id);
+
+    socket.emit("join", user._id);
+    console.log("Joined socket room: ", user._id);
+  });
+  return () => {
+    socket.off("connect");
+  };
+}, [user]);
+
+//SET HANDLE AND DELETE NEW NOTIFICATION USEEFFECT
+useEffect(() => {
+  const handleNewNotification = (notification) => {
+    console.log("New notification received:", notification);
+
+    setNotifications((prev) => [
+      notification,
+      ...prev
+    ]);
+  };
+
+  const handleNotificationDeleted = (notificationId) => {
+    console.log("Notification deleted:", notificationId);
+
+    setNotifications((prev) =>
+      prev.filter(
+        (notification) => notification._id !== notificationId
+      )
+    );
+  };
+
+  socket.on("newNotification", handleNewNotification);
+  socket.on("notificationDeleted", handleNotificationDeleted);
+
+  return () => {
+    socket.off("newNotification", handleNewNotification);
+    socket.off("notificationDeleted", handleNotificationDeleted);
+  };
+}, []);
+
+const handleSearch = async () => {
   if (!search.trim()) return;
 
-  navigate(`/?search=${encodeURIComponent(search.trim())}`);
- };
+  const trimmedSearch = search.trim();
+
+  try {
+    const response = await addSearchHistory(trimmedSearch);
+
+    setSearchHistory((prev) => [response.data, ...prev]);
+
+    setShowSearchHistory(false);
+
+    navigate(`/?search=${encodeURIComponent(trimmedSearch)}`);
+  } catch (error) {
+    console.error("Failed to save search history:", error);
+
+    setShowSearchHistory(false);
+
+    navigate(`/?search=${encodeURIComponent(trimmedSearch)}`);
+  }
+};
+
+const handleHistoryClick = (query) => {
+  setSearch(query);
+  setShowSearchHistory(false);
+
+  navigate(`/?search=${encodeURIComponent(query)}`);
+};
+
+const handleDeleteHistory = async (searchHistoryId) => {
+  try {
+    await deleteSearchHistory(searchHistoryId);
+
+    setSearchHistory((prev) =>
+      prev.filter((item) => item._id !== searchHistoryId)
+    );
+  } catch (error) {
+    console.error("Failed to delete search history:", error);
+  }
+};
+
+const handleClearHistory = async () => {
+  try {
+    await clearSearchHistory();
+
+    setSearchHistory([])
+  } catch (error) {
+    console.error("Failed to clear search history:", error);
+  }
+};
+
+const handleNotificationClick = async (notification) => {
+  try {
+    // Mark notification as read
+    if (!notification.isRead) {
+      await markNotificationAsRead(notification._id);
+
+      setNotifications((prev) =>
+        prev.map((item) =>
+          item._id === notification._id
+            ? { ...item, isRead: true }
+            : item
+        )
+      );
+    }
+
+    // Comment / Like → open video
+    if (
+      notification.type === "comment" ||
+      notification.type === "like"
+    ) {
+      if (notification.video?._id) {
+        navigate(`/videos/${notification.video._id}`);
+      }
+    }
+
+    // Subscribe → open subscriber's channel
+    if (notification.type === "subscribe") {
+      if (notification.sender?.username) {
+        navigate(`/channel/${notification.sender.username}`);
+      }
+    }
+
+    // Close notification dropdown
+    setShowNotifications(false);
+
+  } catch (error) {
+    console.error("Failed to handle notification:", error);
+  }
+};
 
  const handleLogout = async () => {
   try {
@@ -36,6 +247,29 @@ function Navbar() {
   }
 };
 
+const highlightMatch = (title) => {
+  if (!search.trim()) return title;
+
+  const searchText = search.trim();
+  const index = title.toLowerCase().indexOf(searchText.toLowerCase());
+
+  if (index === -1) return title;
+
+  return (
+    <>
+      {title.slice(0, index)}
+      <span className="font-bold text-black">
+        {title.slice(index, index + searchText.length)}
+      </span>
+      {title.slice(index + searchText.length)}
+    </>
+  );
+};
+
+const unreadCount = notifications.filter(
+  (notification) => !notification.isRead
+).length;
+
   return (
     <nav className="sticky top-0 z-50 w-full px-6 py-3 border-b bg-white">
       <div className="flex items-center justify-between">
@@ -46,11 +280,13 @@ function Navbar() {
         </h1>
 
         {/* Search */}
-        <div className="flex items-center w-[450px]">
+        <div ref={searchRef} className="relative w-[450px]">
+        <div className="flex items-center">
           <input
             type="text"
             placeholder="Search videos..."
             value={search}
+            onFocus={() => setShowSearchHistory(true)}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => {
              if (e.key === "Enter") {
@@ -67,89 +303,292 @@ function Navbar() {
            <FiSearch />
           </button>
         </div>
+    {showSearchHistory && (
+  <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-xl shadow-lg mt-2 z-50 overflow-hidden">
 
-        {/* User */}
-        <div className="relative">
+    {/* Video Suggestions */}
+    {search.trim() && suggestions.length > 0 && (
+      <div className="py-2">
+        {suggestions.slice(0, 5).map((video) => (
+          <div
+            key={video._id}
+            onClick={() => {
+              setSearch(video.title);
+              setShowSearchHistory(false);
 
-          {user ? (
-            <>
-              {/* Avatar */}
-              <button
-                onClick={() => setShowMenu(!showMenu)}
-                className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-semibold overflow-hidden"
-              >
-                {user.avatar && !avatarError ? (
-                  <img
-                    src={user.avatar}
-                    alt={user.username}
-                    className="w-full h-full object-cover"
-                    onError={() => setAvatarError(true)}
-                  />
-                ) : (
-                  user.username?.charAt(0).toUpperCase()
-                )}
-              </button>
+              navigate(
+                `/watch/${video._id}`
+              );
+            }}
+            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition"
+          >
+            {/* Thumbnail */}
+            <img
+              src={video.thumbnail?.url}
+              alt={video.title}
+              className="w-12 h-8 object-cover rounded"
+            />
 
-              {/* Logout menu */}
-              {showMenu && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg p-2 z-50">
+            {/* Video title */}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {highlightMatch(video.title)}
+              </p>
 
-                  <p className="px-3 py-2 text-sm font-semibold">
-                    {user.username}
-                  </p>
-
-                  {/* My Channel */}
-                   <button
-                    onClick={() => {
-                    navigate(`/channel/${user.username}`);
-                    setShowMenu(false);
-                   }}
-                   className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
-                  >
-                    My Channel
-                  </button>
- 
-                  {/* Upload Video*/}
-                  <button
-                    onClick={() => {
-                     navigate("/upload");
-                     setShowMenu(false);
-                    }}
-                   className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
-                  >
-                    Upload Video
-                  </button>
-
-                   <button
-                     onClick={() => {
-                       navigate("/my-videos");
-                       setShowMenu(false);
-                      }}
-                      className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
-                    >
-                      My Videos
-                    </button>
-
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-red-500"
-                  >
-                    Logout
-                  </button>
-
-                </div>
+              {video.category && (
+                <p className="text-xs text-gray-500">
+                  {video.category}
+                </p>
               )}
-            </>
-          ) : (
-            <button
-              onClick={() => navigate("/login")}
-              className="px-5 py-2 bg-black text-white rounded-full"
-            >
-              Login
-            </button>
-          )}
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
 
-        </div>
+    {/* Search History */}
+    {!search.trim() && searchHistory.length > 0 && (
+      <div className="py-2">
+        {searchHistory.map((item) => (
+          <div
+            key={item._id}
+            onClick={() => handleHistoryClick(item.query)}
+            className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer transition"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <FiClock className="text-gray-400 flex-shrink-0" />
+
+              <span className="text-sm text-gray-700 truncate">
+                {item.query}
+              </span>
+            </div>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteHistory(item._id);
+              }}
+              className="p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition"
+            >
+              <FiX size={16} />
+            </button>
+          </div>
+        ))}
+      </div>
+    )}
+
+    {/* Clear All */}
+    {!search.trim() && searchHistory.length > 0 && (
+      <div className="border-t border-gray-200">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClearHistory();
+          }}
+          className="w-full px-4 py-3 text-left text-sm font-medium text-red-500 hover:bg-red-50 transition"
+        >
+          Clear all search history
+        </button>
+      </div>
+    )}
+
+  </div>
+)}
+    </div>
+
+  {/* Notifications */}
+   <div className="relative">
+    <button
+     onClick={() => setShowNotifications(!showNotifications)}
+      className="relative p-2 rounded-full hover:bg-gray-100"
+    >
+     <FiBell size={22} />
+
+    {unreadCount > 0 && (
+     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
+      {unreadCount}
+    </span>
+   )}
+   </button>
+  {showNotifications && (
+  <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+
+    <div className="px-4 py-3 border-b">
+      <h3 className="font-semibold">
+        Notifications
+      </h3>
+    </div>
+
+    {notifications.length === 0 ? (
+      <div className="px-4 py-8 text-center text-gray-500">
+        No notifications
+      </div>
+    ) : (
+      <div className="max-h-96 overflow-y-auto">
+
+        {notifications.map((notification) => (
+          <div
+            key={notification._id}
+            onClick={() => handleNotificationClick(notification)}
+            className={`px-4 py-3 border-b hover:bg-gray-50 cursor-pointer ${
+           !notification.isRead ? "bg-blue-50" : ""
+          }`}
+          >
+      <div className="flex gap-3">
+
+  {/* Sender Avatar */}
+  <img
+    src={notification.sender?.avatar}
+    alt={notification.sender?.username}
+    className="w-9 h-9 rounded-full object-cover"
+  />
+
+  <div className="flex-1">
+
+    {/* Comment Notification */}
+    {notification.type === "comment" && (
+      <>
+        <p className="text-sm text-gray-700">
+          <span className="font-semibold">
+            {notification.sender?.username}
+          </span>{" "}
+          commented on your video{" "}
+          <span className="font-semibold">
+            "{notification.video?.title}"
+          </span>
+        </p>
+
+        {/* Actual Comment */}
+        <p className="text-sm text-gray-500 mt-1">
+          "{notification.comment?.content}"
+        </p>
+      </>
+    )}
+
+    {/* Like Notification */}
+    {notification.type === "like" && (
+      <p className="text-sm text-gray-700">
+        <span className="font-semibold">
+          {notification.sender?.username}
+        </span>{" "}
+        liked your video{" "}
+        <span className="font-semibold">
+          "{notification.video?.title}"
+        </span>
+      </p>
+    )}
+
+    {/* Subscribe Notification */}
+    {notification.type === "subscribe" && (
+      <p className="text-sm text-gray-700">
+        <span className="font-semibold">
+          {notification.sender?.username}
+        </span>{" "}
+        subscribed to your channel.
+      </p>
+    )}
+
+    {/* New indicator */}
+    {!notification.isRead && (
+      <p className="text-xs text-blue-500 mt-1">
+        New
+      </p>
+    )}
+
+  </div>
+
+</div>
+
+      </div>
+    ))}
+
+    </div>
+    )}
+  </div>
+)}
+  </div>
+
+  {/* User */}
+   <div className="relative">
+
+   {user ? (
+     <>
+    {/* Avatar */}
+     <button
+       onClick={() => setShowMenu(!showMenu)}
+         className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-semibold overflow-hidden"
+      >
+       {user.avatar && !avatarError ? (
+        <img
+          src={user.avatar}
+          alt={user.username}
+          className="w-full h-full object-cover"
+          onError={() => setAvatarError(true)}
+        />
+        ) : (
+         user.username?.charAt(0).toUpperCase()
+        )}
+      </button>
+
+{/* Logout menu */}
+  {showMenu && (
+    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg p-2 z-50">
+      <p className="px-3 py-2 text-sm font-semibold">
+        {user.username}
+          </p>
+
+  {/* My Channel */}
+    <button
+      onClick={() => {
+       navigate(`/channel/${user.username}`);
+       setShowMenu(false);
+      }}
+      className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+    >
+       My Channel
+    </button>
+ 
+{/* Upload Video*/}
+  <button
+    onClick={() => {
+     navigate("/upload");
+     setShowMenu(false);
+    }}
+     className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+  >
+    Upload Video
+  </button>
+
+  <button
+    onClick={() => {
+     navigate("/my-videos");
+     setShowMenu(false);
+    }}
+       className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+  >
+    My Videos
+  </button>
+
+  <button
+    onClick={handleLogout}
+    className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-red-500"
+  >
+    Logout
+  </button>
+
+   </div>
+   )}
+  </>
+  ) : (
+  <button
+    onClick={() => navigate("/login")}
+    className="px-5 py-2 bg-black text-white rounded-full"
+  >
+    Login
+  </button>
+  )}
+
+    </div>
 
       </div>
     </nav>
