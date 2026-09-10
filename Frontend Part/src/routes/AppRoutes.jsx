@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, Router } from "react-router-dom";
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute.jsx";
 import MainLayout from "../layouts/MainLayout";
 import Home from "../pages/Home";
 import VideoDetails from "../pages/VideoDetails";
@@ -28,19 +28,19 @@ function AppRoutes() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/videos/:videoId" element={<VideoDetails/>} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/upload" element={<UploadVideo />} />
-          <Route path="/my-videos" element={<MyVideos />} />
-          <Route path="/edit-video/:videoId" element={<EditVideo />} />
+          <Route path="/notifications" element={<ProtectedRoute> <Notifications/> </ProtectedRoute>} />
+          <Route path="/upload" element={ <ProtectedRoute> <UploadVideo/> </ProtectedRoute>} />
+          <Route path="/my-videos" element={<ProtectedRoute> <MyVideos/> </ProtectedRoute>} />
+          <Route path="/edit-video/:videoId" element={<ProtectedRoute> <EditVideo/> </ProtectedRoute>} />
           <Route path="/channel/:username" element={<Channel />} />
-          <Route path="/channel/:channelId/subscribers" element={<ChannelSubscribers />} />
-          <Route path="/channel/:channelId/subscriptions" element={<ChannelSubscriptions />} />
-          <Route path="/subscriptions" element={<Subscriptions />} />
-          <Route path="/history" element={<History />} />
-          <Route path= "/liked-videos" element={<LikedVideos />} />
-          <Route path= "/watch-later" element={<WatchLater />} />
-          <Route path= "/playlists" element={<Playlist />} />
-          <Route path= "/playlists/:playlistId" element={<PlaylistDetails />} />
+          <Route path="/channel/:channelId/subscribers" element={<ProtectedRoute> <ChannelSubscribers/> </ProtectedRoute>} />
+          <Route path="/channel/:channelId/subscriptions" element={<ProtectedRoute> <ChannelSubscriptions/> </ProtectedRoute> } />
+          <Route path="/subscriptions" element={<ProtectedRoute> <Subscriptions/> </ProtectedRoute>} />
+          <Route path="/history" element={<ProtectedRoute> <History/> </ProtectedRoute>} />
+          <Route path= "/liked-videos" element={<ProtectedRoute> <LikedVideos/> </ProtectedRoute>} />
+          <Route path= "/watch-later" element={<ProtectedRoute> <WatchLater/> </ProtectedRoute>} />
+          <Route path= "/playlists" element={<ProtectedRoute> <Playlist/> </ProtectedRoute>} />
+          <Route path= "/playlists/:playlistId" element={<ProtectedRoute> <PlaylistDetails/> </ProtectedRoute>} />
         </Route>
       </Routes>
     </BrowserRouter>
