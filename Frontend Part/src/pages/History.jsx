@@ -1,10 +1,22 @@
 import { useEffect, useState } from "react";
-import { getWatchHistory } from "../services/authService";
+import { getWatchHistory, removeFromWatchHistory } from "../services/authService";
 import VideoCard from "../components/VideoCard/VideoCard";
 
 function History() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleRemoveVideo = async (videoId) => {
+  try {
+    await removeFromWatchHistory(videoId);
+
+    setHistory((prev) =>
+      prev.filter((video) => video._id !== videoId)
+    );
+  } catch (error) {
+    console.error("Failed to remove video from history:", error);
+  }
+};
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -45,15 +57,24 @@ function History() {
       ) : (
         <div className="grid gap-8 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
           {history.map((video) => (
-            <VideoCard
-              key={video._id}
-              videoId={video._id}
-              title={video.title}
-              channel={video.owner?.username}
-              views={video.views}
-              thumbnail={video.thumbnail?.url}
-              duration={video.duration}
-            />
+            <div key={video._id}>
+    <VideoCard
+      videoId={video._id}
+      title={video.title}
+      channel={video.owner?.username}
+      views={video.views}
+      thumbnail={video.thumbnail?.url}
+      duration={video.duration}
+    />
+
+    <button
+      onClick={() => handleRemoveVideo(video._id)}
+      className="mt-2 text-sm text-red-500 hover:text-red-700 hover:underline transition"
+    >
+      Remove from history
+    </button>
+  </div>
+           
           ))}
         </div>
       )}

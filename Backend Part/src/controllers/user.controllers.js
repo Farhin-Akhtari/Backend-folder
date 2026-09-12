@@ -549,6 +549,33 @@ const getWatchLater = asyncHandler(async (req, res) => {
 
 })
 
+const removeFromWatchHistory = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "INVALID VIDEO ID");
+    }
+
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $pull: {
+                watchHistory: videoId
+            }
+        }
+    );
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "Video removed from watch history"
+            )
+        );
+});
+
 const toggleWatchLater = asyncHandler(async (req, res) => {
    const {videoId} = req.params;
 
@@ -616,5 +643,6 @@ export { registerUser,
          getUserChannelProfile,
          getWatchHistory,
          getWatchLater,
-         toggleWatchLater
+         toggleWatchLater,
+         removeFromWatchHistory,
        }

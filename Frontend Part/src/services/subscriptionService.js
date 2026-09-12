@@ -10,7 +10,7 @@ export const getChannelSubscribers = async (channelId) => {
   const response = await api.get(`/subscriptions/c/${channelId}`);
   return response.data;
 };
-
+    
 export const getChannelSubscriptions = async (channelId) => {
   const response = await api.get("/subscriptions", {
     params: {

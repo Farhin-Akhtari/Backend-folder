@@ -55,9 +55,11 @@ function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
 
-
   useEffect(() => {
     const fetchSearchHistory = async () => {
+      if(!user){
+        return;
+      }
       try {
         const response = await getSearchHistory();
         setSearchHistory(response.data);

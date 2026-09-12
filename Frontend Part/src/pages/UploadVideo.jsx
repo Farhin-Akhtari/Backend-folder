@@ -131,7 +131,7 @@ function UploadVideo() {
       {/* Publish */}
       <button
         type="submit"
-        className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition"
+        className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-white-800 transition"
       >
         Publish Video
       </button>

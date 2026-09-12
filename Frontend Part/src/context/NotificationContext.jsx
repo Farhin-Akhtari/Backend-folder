@@ -6,8 +6,13 @@ export const NotificationContext = createContext();
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
+  const user = localStorage.getItem("user");
+
   useEffect(() => {
     const fetchNotifications = async () => {
+      if(!user){
+        return;
+      }
       try {
         const response = await getUserNotification();
         setNotifications(response.data || []);

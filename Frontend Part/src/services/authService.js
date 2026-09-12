@@ -19,3 +19,8 @@ export const getWatchHistory = async () => {
   const response = await api.get("/users/watch-history");
   return response.data;
 };
+
+export const removeFromWatchHistory = async (videoId) => {
+  const response = await api.delete(`/users/watch-history/${videoId}`);
+  return response.data;
+};
