@@ -63,7 +63,7 @@ function EditVideo() {
 
   if (loading) {
     return (
-      <h2 className="text-center text-xl mt-10">
+      <h2 className="text-center text-xl mt-10 text-gray-900 dark:text-white">
         Loading...
       </h2>
     );
@@ -72,7 +72,7 @@ function EditVideo() {
   return (
     <div className="max-w-2xl mx-auto py-8">
 
-      <h1 className="text-2xl font-bold mb-6">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
         Edit Video
       </h1>
 
@@ -86,7 +86,7 @@ function EditVideo() {
 
         {/* Title */}
         <div>
-          <label className="block font-semibold mb-2">
+          <label className="block font-semibold mb-2 text-gray-900 dark:text-white">
             Title
           </label>
 
@@ -94,13 +94,13 @@ function EditVideo() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
           />
         </div>
 
         {/* Description */}
         <div>
-          <label className="block font-semibold mb-2">
+          <label className="block font-semibold mb-2 text-gray-900 dark:text-white">
             Description
           </label>
 
@@ -108,13 +108,13 @@ function EditVideo() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows="5"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
           />
         </div>
 
         {/* Thumbnail */}
         <div>
-          <label className="block font-semibold mb-2">
+          <label className="block font-semibold mb-2 text-gray-900 dark:text-white">
             New Thumbnail
           </label>
 
@@ -122,7 +122,7 @@ function EditVideo() {
             type="file"
             accept="image/*"
             onChange={(e) => setThumbnail(e.target.files[0])}
-            className="w-full border border-gray-300 rounded-lg p-3"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg p-3"
           />
         </div>
 
@@ -130,7 +130,7 @@ function EditVideo() {
         <button
           type="submit"
           disabled={updating}
-          className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-50"
+          className="w-full bg-black text-white dark:bg-white dark:text-black py-3 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition disabled:opacity-50"
         >
           {updating ? "Updating..." : "Update Video"}
         </button>

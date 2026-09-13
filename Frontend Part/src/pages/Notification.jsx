@@ -56,27 +56,27 @@ function Notifications() {
 };
 
   return (
-  <div className="max-w-3xl mx-auto p-6">
+  <div className="max-w-3xl mx-auto p-6 text-gray-900 dark:text-white">
     <h1 className="text-2xl font-bold mb-6">
       Notifications
     </h1>
 
     {notifications.length === 0 ? (
-      <p className="text-gray-500 text-center py-10">
+      <p className="text-gray-500 dark:text-gray-400 text-center py-10">
         No notifications
       </p>
     ) : (
-      <div className="bg-white rounded-xl shadow-sm border">
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         {notifications.map((notification) => (
          <div
            key={notification._id}
            onClick={() => handleNotificationClick(notification)}
-           className={`flex gap-4 p-4 border-b last:border-b-0 cursor-pointer
-            transition-all duration-200
-            hover:bg-gray-200 hover:scale-[1.01]${
-           !notification.isRead ? "bg-blue-100" : "bg-white"
-            } cursor-pointer hover:bg-gray-100`}
-        >
+           className={`flex gap-4 p-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 cursor-pointer transition-all duration-200 hover:scale-[1.01] ${
+            !notification.isRead
+             ? "bg-blue-100 dark:bg-blue-900/30"
+             : "bg-white dark:bg-gray-900"
+            } hover:bg-gray-100 dark:hover:bg-gray-800`}
+          >
             {/* Sender Avatar */}
             <img
               src={notification.sender?.avatar}
@@ -90,7 +90,7 @@ function Notifications() {
               {/* Comment */}
               {notification.type === "comment" && (
                 <>
-                  <p className="text-gray-700">
+                 <p className="text-gray-700 dark:text-gray-200">
                     <span className="font-semibold">
                       {notification.sender?.username}
                     </span>{" "}
@@ -100,7 +100,7 @@ function Notifications() {
                     </span>
                   </p>
 
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     "{notification.comment?.content}"
                   </p>
                 </>
@@ -108,7 +108,7 @@ function Notifications() {
 
               {/* Like */}
               {notification.type === "like" && (
-                <p className="text-gray-700">
+                <p className="text-gray-700 dark:text-gray-200">
                   <span className="font-semibold">
                     {notification.sender?.username}
                   </span>{" "}
@@ -121,7 +121,7 @@ function Notifications() {
 
               {/* Subscribe */}
               {notification.type === "subscribe" && (
-                <p className="text-gray-700">
+                <p className="text-gray-700 dark:text-gray-200">
                   <span className="font-semibold">
                     {notification.sender?.username}
                   </span>{" "}

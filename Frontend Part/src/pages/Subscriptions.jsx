@@ -30,7 +30,7 @@ function Subscriptions() {
 
   if (loading) {
     return (
-      <h2 className="text-center text-xl mt-10">
+      <h2 className="text-center text-xl mt-10 text-gray-900 dark:text-white">
         Loading subscriptions...
       </h2>
     );
@@ -46,12 +46,12 @@ function Subscriptions() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8">
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
         Subscriptions
       </h1>
 
       {channels.length === 0 ? (
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-gray-400">
           You haven't subscribed to any channels yet.
         </p>
       ) : (
@@ -63,7 +63,7 @@ function Subscriptions() {
               <div
                 key={subscription._id}
                 onClick={() => navigate(`/channel/${channel.username}`)}
-                className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition"
+                className="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition"
               >
                 {/* Avatar */}
                 {channel.avatar ? (
@@ -73,18 +73,18 @@ function Subscriptions() {
                     className="w-14 h-14 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center font-bold text-lg">
+                  <div className="w-14 h-14 rounded-full bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white flex items-center justify-center font-bold text-lg">
                     {channel.username?.[0]?.toUpperCase()}
                   </div>
                 )}
 
                 {/* Channel information */}
                 <div>
-                  <h2 className="font-semibold text-lg">
+                  <h2 className="font-semibold text-lg text-gray-900 dark:text-white">
                     {channel.fullName}
                   </h2>
 
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 dark:text-gray-400">
                     @{channel.username}
                   </p>
                 </div>

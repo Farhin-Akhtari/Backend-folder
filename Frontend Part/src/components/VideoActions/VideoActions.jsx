@@ -15,8 +15,8 @@ function VideoActions({
         onClick={onLike}
         className={`px-4 py-2 rounded-full font-semibold transition ${
           liked
-            ? "bg-black text-white"
-            : "bg-gray-200 text-black"
+            ? "bg-black text-white dark:bg-white dark:text-black"
+            : "bg-gray-200 text-black dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
         }`}
       >
         {liked ? "❤️ Liked" : "♡ Like"} {likesCount}
@@ -27,8 +27,8 @@ function VideoActions({
         onClick={onWatchLater}
         className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition ${
           watchLater
-            ? "bg-black text-white"
-            : "bg-gray-200 text-black"
+            ? "bg-black text-white dark:bg-white dark:text-black"
+            : "bg-gray-200 text-black dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
         }`}
       >
         <MdWatchLater className="text-xl" />

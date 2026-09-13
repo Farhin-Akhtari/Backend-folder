@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiSearch, FiClock, FiX, FiBell } from "react-icons/fi";
+import { FiSearch, FiClock, FiX, FiBell, FiSun, FiMoon } from "react-icons/fi";
 import { logoutUser } from "../../services/authService.js";
 import { getSearchHistory, addSearchHistory, deleteSearchHistory, clearSearchHistory } from "../../services/searchHistory.js";
 import {getAllVideos} from "../../services/videoService.js"
 import socket from "../../services/socketService.js";
 import { NotificationContext } from "../../context/NotificationContext.jsx";
+import {useTheme} from "../../context/ThemeContext.jsx";
 
 const getTimeAgo = (date) => {
   const seconds = Math.floor(
@@ -44,6 +45,7 @@ function Navbar() {
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("user"))
   );
+  const { darkMode, toggleTheme } = useTheme();
 
   const [search, setSearch] = useState("");
   const [searchHistory, setSearchHistory] = useState([]);
@@ -258,7 +260,7 @@ const highlightMatch = (title) => {
   return (
     <>
       {title.slice(0, index)}
-      <span className="font-bold text-black">
+      <span className="font-bold text-black dark:text-white">
         {title.slice(index, index + searchText.length)}
       </span>
       {title.slice(index + searchText.length)}
@@ -271,7 +273,7 @@ const unreadCount = notifications.filter(
 ).length;
 
   return (
-    <nav className="sticky top-0 z-50 w-full px-6 py-3 border-b bg-white">
+    <nav className="sticky top-0 z-50 w-full px-6 py-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700">
       <div className="flex items-center justify-between">
 
         {/* Logo */}
@@ -293,18 +295,18 @@ const unreadCount = notifications.filter(
                handleSearch();
               }
             }}
-            className="border border-gray-300 rounded-l-full px-4 py-2 w-full outline-none"
+            className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-l-full px-4 py-2 w-full outline-none"
           />
 
          <button
             onClick={handleSearch}
-            className="bg-gray-100 border border-gray-300 px-4 py-3 rounded-r-full hover:bg-gray-200 transition"
+            className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 px-4 py-3 rounded-r-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
           >
            <FiSearch />
           </button>
         </div>
     {showSearchHistory && (
-  <div className="absolute top-full left-0 w-full bg-white border border-gray-200 rounded-xl shadow-lg mt-2 z-50 overflow-hidden">
+  <div className="absolute top-full left-0 w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg mt-2 z-50 overflow-hidden">
 
     {/* Video Suggestions */}
     {search.trim() && suggestions.length > 0 && (
@@ -320,7 +322,7 @@ const unreadCount = notifications.filter(
                 `/watch/${video._id}`
               );
             }}
-            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition"
+           className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
           >
             {/* Thumbnail */}
             <img
@@ -331,12 +333,12 @@ const unreadCount = notifications.filter(
 
             {/* Video title */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                 {highlightMatch(video.title)}
               </p>
 
               {video.category && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {video.category}
                 </p>
               )}
@@ -353,12 +355,12 @@ const unreadCount = notifications.filter(
           <div
             key={item._id}
             onClick={() => handleHistoryClick(item.query)}
-            className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer transition"
+            className="flex items-center justify-between px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
           >
             <div className="flex items-center gap-3 min-w-0">
               <FiClock className="text-gray-400 flex-shrink-0" />
 
-              <span className="text-sm text-gray-700 truncate">
+              <span className="text-sm text-gray-700 dark:text-gray-200 truncate">
                 {item.query}
               </span>
             </div>
@@ -368,7 +370,7 @@ const unreadCount = notifications.filter(
                 e.stopPropagation();
                 handleDeleteHistory(item._id);
               }}
-              className="p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition"
+             className="p-1.5 rounded-full text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
             >
               <FiX size={16} />
             </button>
@@ -379,13 +381,13 @@ const unreadCount = notifications.filter(
 
     {/* Clear All */}
     {!search.trim() && searchHistory.length > 0 && (
-      <div className="border-t border-gray-200">
+     <div className="border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={(e) => {
             e.stopPropagation();
             handleClearHistory();
           }}
-          className="w-full px-4 py-3 text-left text-sm font-medium text-red-500 hover:bg-red-50 transition"
+         className="w-full px-4 py-3 text-left text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
         >
           Clear all search history
         </button>
@@ -396,11 +398,13 @@ const unreadCount = notifications.filter(
 )}
     </div>
 
+  <div className="flex items-center gap-7">
+
   {/* Notifications */}
    <div className="relative">
     <button
      onClick={() => setShowNotifications(!showNotifications)}
-      className="relative p-2 rounded-full hover:bg-gray-100"
+      className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
     >
      <FiBell size={22} />
 
@@ -411,16 +415,16 @@ const unreadCount = notifications.filter(
    )}
    </button>
   {showNotifications && (
-  <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 overflow-hidden">
 
-    <div className="px-4 py-3 border-b">
+    <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
       <h3 className="font-semibold">
         Notifications
       </h3>
     </div>
 
     {notifications.length === 0 ? (
-      <div className="px-4 py-8 text-center text-gray-500">
+      <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
         No notifications
       </div>
     ) : (
@@ -430,9 +434,9 @@ const unreadCount = notifications.filter(
           <div
             key={notification._id}
             onClick={() => handleNotificationClick(notification)}
-            className={`px-4 py-3 border-b hover:bg-gray-50 cursor-pointer ${
-           !notification.isRead ? "bg-blue-50" : ""
-          }`}
+            className={`px-4 py-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer ${
+              !notification.isRead ? "bg-blue-50 dark:bg-blue-900/30" : ""
+           }`}
           >
       <div className="flex gap-3">
 
@@ -448,7 +452,7 @@ const unreadCount = notifications.filter(
     {/* Comment Notification */}
     {notification.type === "comment" && (
       <>
-        <p className="text-sm text-gray-700">
+        <p className="text-sm text-gray-700 dark:text-gray-200">
           <span className="font-semibold">
             {notification.sender?.username}
           </span>{" "}
@@ -459,7 +463,7 @@ const unreadCount = notifications.filter(
         </p>
 
         {/* Actual Comment */}
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           "{notification.comment?.content}"
         </p>
       </>
@@ -467,7 +471,7 @@ const unreadCount = notifications.filter(
 
     {/* Like Notification */}
     {notification.type === "like" && (
-      <p className="text-sm text-gray-700">
+      <p className="text-sm text-gray-700 dark:text-gray-200">
         <span className="font-semibold">
           {notification.sender?.username}
         </span>{" "}
@@ -480,7 +484,7 @@ const unreadCount = notifications.filter(
 
     {/* Subscribe Notification */}
     {notification.type === "subscribe" && (
-      <p className="text-sm text-gray-700">
+      <p className="text-sm text-gray-700 dark:text-gray-200">
         <span className="font-semibold">
           {notification.sender?.username}
         </span>{" "}
@@ -520,7 +524,7 @@ const unreadCount = notifications.filter(
     {/* Avatar */}
      <button
        onClick={() => setShowMenu(!showMenu)}
-         className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-semibold overflow-hidden"
+         className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 dark:text-white flex items-center justify-center font-semibold overflow-hidden"
       >
        {user.avatar && !avatarError ? (
         <img
@@ -536,7 +540,7 @@ const unreadCount = notifications.filter(
 
 {/* Logout menu */}
   {showMenu && (
-    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg p-2 z-50">
+   <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 z-50">
       <p className="px-3 py-2 text-sm font-semibold">
         {user.username}
           </p>
@@ -547,7 +551,7 @@ const unreadCount = notifications.filter(
        navigate(`/channel/${user.username}`);
        setShowMenu(false);
       }}
-      className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+      className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
     >
        My Channel
     </button>
@@ -558,7 +562,7 @@ const unreadCount = notifications.filter(
      navigate("/upload");
      setShowMenu(false);
     }}
-     className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+     className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
   >
     Upload Video
   </button>
@@ -568,14 +572,32 @@ const unreadCount = notifications.filter(
      navigate("/my-videos");
      setShowMenu(false);
     }}
-       className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100"
+       className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
   >
     My Videos
   </button>
 
+ {/* Theme Toggle Button */}
+  <button
+    onClick={toggleTheme}
+   className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+  >
+    {darkMode ? (
+  <>
+    <FiSun className="inline mr-2" />
+    Light Mode
+  </>
+) : (
+  <>
+    <FiMoon className="inline mr-2" />
+    Dark Mode
+  </>
+)}
+  </button>
+
   <button
     onClick={handleLogout}
-    className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-red-500"
+    className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500"
   >
     Logout
   </button>
@@ -586,12 +608,13 @@ const unreadCount = notifications.filter(
   ) : (
   <button
     onClick={() => navigate("/login")}
-    className="px-5 py-2 bg-black text-white rounded-full"
+    className="px-5 py-2 bg-black dark:bg-white text-white dark:text-black rounded-full hover:bg-gray-800 dark:hover:bg-gray-200 transition"
   >
     Login
   </button>
   )}
 
+    </div>
     </div>
 
       </div>

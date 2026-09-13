@@ -12,30 +12,29 @@ function Home() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
- 
 
-    useEffect(() => {
-      const fetchVideos = async () => {
-        try {
-          const response = await getAllVideos(searchQuery);
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await getAllVideos(searchQuery);
 
-           console.log("First Videos:", response[0]);
+        console.log("First Videos:", response[0]);
 
-         setVideos(response);
-          } catch (err) {
-             console.error(err);
-             setError("Failed to fetch videos");
-            } finally {
-             setLoading(false);
-        }
-      };
+        setVideos(response);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch videos");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-       fetchVideos();
-    }, [searchQuery]);
+    fetchVideos();
+  }, [searchQuery]);
 
-       if (loading) {
+  if (loading) {
     return (
-      <h2 className="text-center text-xl mt-10">
+      <h2 className="text-center text-xl mt-10 text-gray-900 dark:text-white">
         Loading...
       </h2>
     );
@@ -48,53 +47,53 @@ function Home() {
       </h2>
     );
   }
+
   console.log("videos state:", videos);
 
   const filteredVideos =
-  selectedCategory === "All"
-    ? videos
-    : videos.filter(
-        (video) => video.category === selectedCategory
-      );
+    selectedCategory === "All"
+      ? videos
+      : videos.filter(
+          (video) => video.category === selectedCategory
+        );
 
   return (
-   <div>
-  
-    {/*Category bar */}
+    <div>
+
+      {/* Category bar */}
       <CategoryBar
-       selectedCategory={selectedCategory}
-       setSelectedCategory={setSelectedCategory}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
       />
 
-    {searchQuery && (
-    <h2 className="text-xl font-semibold mb-6">
-      Search results for: "{searchQuery}"
-   </h2>
-  )}
+      {searchQuery && (
+        <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
+          Search results for: "{searchQuery}"
+        </h2>
+      )}
 
-       {/*Video grid*/}
-    <div className="grid gap-8 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
-    {filteredVideos.length > 0 ? (
-     filteredVideos.map((video) => (
-    <VideoCard
-      key={video._id}
-      videoId={video._id}
-      title={video.title}
-      channel={video.owner?.username}
-      views={video.views}
-      thumbnail={video.thumbnail?.url}
-      duration={video.duration}
-    />
-   ))
-  ) : (
-   <p className="text-gray-500">
-     No videos found.
-   </p>
- )}
- </div>
-    
+      {/* Video grid */}
+      <div className="grid gap-8 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
+        {filteredVideos.length > 0 ? (
+          filteredVideos.map((video) => (
+            <VideoCard
+              key={video._id}
+              videoId={video._id}
+              title={video.title}
+              channel={video.owner?.username}
+              views={video.views}
+              thumbnail={video.thumbnail?.url}
+              duration={video.duration}
+            />
+          ))
+        ) : (
+          <p className="text-gray-500 dark:text-gray-400">
+            No videos found.
+          </p>
+        )}
+      </div>
+
     </div>
-
   );
 }
 

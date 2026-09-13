@@ -14,8 +14,8 @@ function LikedVideos() {
         console.log("Liked Videos:", response);
 
         const likedVideos = response.data
-        .map((item) => item.likedVideo)
-        .filter(Boolean);
+          .map((item) => item.likedVideo)
+          .filter(Boolean);
 
         setVideos(likedVideos);
       } catch (error) {
@@ -30,7 +30,7 @@ function LikedVideos() {
 
   if (loading) {
     return (
-      <h2 className="text-center text-xl mt-10">
+      <h2 className="text-center text-xl mt-10 text-gray-900 dark:text-white">
         Loading liked videos...
       </h2>
     );
@@ -38,7 +38,7 @@ function LikedVideos() {
 
   if (videos.length === 0) {
     return (
-      <h2 className="text-center text-xl mt-10">
+      <h2 className="text-center text-xl mt-10 text-gray-900 dark:text-white">
         You haven't liked any videos yet.
       </h2>
     );
@@ -46,7 +46,7 @@ function LikedVideos() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
         Liked Videos
       </h1>
 

@@ -88,8 +88,8 @@ function Sidebar() {
         onClick={() => handleNavigation(item)}
         className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer transition-all duration-200 ${
           activeMenu === item.name
-            ? "bg-gray-200 font-semibold"
-            : "hover:bg-gray-100"
+            ? "bg-gray-200 dark:bg-gray-700 font-semibold"
+            : "hover:bg-gray-100 dark:hover:bg-gray-800"
         }`}
       >
         <span className="text-xl">{item.icon}</span>
@@ -99,17 +99,17 @@ function Sidebar() {
   };
 
   return (
-    <aside className="fixed top-16 left-0 w-64 h-[calc(100vh-64px)] bg-white border-r border-gray-200 p-4 overflow-y-auto">
+     <aside className="fixed top-16 left-0 w-64 h-[calc(100vh-64px)] bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
       
       {/* Main Menu */}
       <ul className="space-y-2">
         {renderMenuItems(mainMenuItems)}
       </ul>
 
-      <hr className="my-4 border-gray-200" />
+      <hr className="my-4 border-gray-200 dark:border-gray-700" />
 
       {/* You */}
-      <h2 className="px-3 mb-2 text-sm font-semibold text-gray-500">
+        <h2 className="px-3 mb-2 text-sm font-semibold text-gray-500 dark:text-gray-400">
         You
       </h2>
 
@@ -117,7 +117,7 @@ function Sidebar() {
         {renderMenuItems(yourMenuItems)}
       </ul>
 
-      <hr className="my-4 border-gray-200" />
+      <hr className="my-4 border-gray-200 dark:border-gray-700" />
 
       {/* Other */}
       <ul className="space-y-2">

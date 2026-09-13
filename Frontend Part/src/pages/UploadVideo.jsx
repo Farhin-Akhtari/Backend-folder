@@ -44,7 +44,7 @@ function UploadVideo() {
   };
 
   return (
-  <div className="max-w-2xl mx-auto py-8 px-4">
+  <div className="max-w-2xl mx-auto py-8 px-4 text-gray-900 dark:text-white">
     <h1 className="text-3xl font-bold mb-8">
       Upload Video
     </h1>
@@ -62,7 +62,7 @@ function UploadVideo() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter video title"
-          className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black"
+          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
         />
       </div>
 
@@ -77,7 +77,7 @@ function UploadVideo() {
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter video description"
           rows="5"
-          className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black"
+          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
         />
       </div>
 
@@ -90,7 +90,7 @@ function UploadVideo() {
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none"
+         className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg px-4 py-3 outline-none"
         >
           {categories.map((item) => (
             <option key={item} value={item}>
@@ -110,7 +110,7 @@ function UploadVideo() {
           type="file"
           accept="video/*"
           onChange={(e) => setVideoFile(e.target.files[0])}
-          className="w-full border border-gray-300 rounded-lg p-3"
+          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg p-3"
         />
       </div>
 
@@ -124,14 +124,14 @@ function UploadVideo() {
           type="file"
           accept="image/*"
           onChange={(e) => setThumbnail(e.target.files[0])}
-          className="w-full border border-gray-300 rounded-lg p-3"
+          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg p-3"
         />
       </div>
 
       {/* Publish */}
       <button
         type="submit"
-        className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-white-800 transition"
+        className="w-full bg-black dark:bg-white text-white dark:text-black py-3 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition"
       >
         Publish Video
       </button>

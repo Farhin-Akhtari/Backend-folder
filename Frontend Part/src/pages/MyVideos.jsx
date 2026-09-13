@@ -50,7 +50,7 @@ function MyVideos() {
 
   if (loading) {
     return (
-      <h2 className="text-center text-xl mt-10">
+      <h2 className="text-center text-xl mt-10 text-gray-900 dark:text-white">
         Loading your videos...
       </h2>
     );
@@ -65,7 +65,7 @@ function MyVideos() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 text-gray-900 dark:text-white">
       <h1 className="text-2xl font-bold mb-6">
         My Videos
       </h1>
@@ -90,7 +90,7 @@ function MyVideos() {
 
       <button
         onClick={() => navigate(`/edit-video/${video._id}`)}
-        className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+        className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200"
       >
         Edit
       </button>

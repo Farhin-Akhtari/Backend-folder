@@ -24,7 +24,7 @@ function VideoCard({
       className="cursor-pointer"
     >
       {/* Thumbnail */}
-      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-200">
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800">
         <img
           src={thumbnail}
           alt={title}
@@ -54,7 +54,7 @@ function VideoCard({
            className="w-10 h-10 rounded-full object-cover"
         />
       ) : (
-    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 font-semibold">
+    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold">
        {channel?.[0]?.toUpperCase()}
      </div>
     )}
@@ -64,11 +64,11 @@ function VideoCard({
         <div className="flex flex-1 min-w-0">
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-base line-clamp-2">
+            <h3 className="font-semibold text-base line-clamp-2 text-gray-900 dark:text-white">
               {title}
             </h3>
 
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
               <span
              onClick={(e) => {
              e.stopPropagation();

@@ -26,7 +26,7 @@ function WatchLater() {
 
   if (loading) {
     return (
-      <h2 className="text-center text-xl mt-10">
+      <h2 className="text-center text-xl mt-10 text-gray-900 dark:text-white">
         Loading watch later videos...
       </h2>
     );
@@ -34,7 +34,7 @@ function WatchLater() {
 
   if (videos.length === 0) {
     return (
-      <h2 className="text-center text-xl mt-10">
+      <h2 className="text-center text-xl mt-10 text-gray-900 dark:text-white">
         You haven't saved any videos for later.
       </h2>
     );
@@ -42,7 +42,7 @@ function WatchLater() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
         Watch Later
       </h1>
 
