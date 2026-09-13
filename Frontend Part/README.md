@@ -134,7 +134,7 @@ The PlayNest frontend communicates with the PlayNest backend through REST APIs a
 
 The backend is available in the backend folder of this repository.
 
-See the Backend README for backend setup and API details.
+See the Backend Part README for backend setup and API details.
 
 ## 🌙 Dark Mode
 

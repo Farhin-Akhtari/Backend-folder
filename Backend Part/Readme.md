@@ -144,7 +144,7 @@ npm run dev
 
 The PlayNest frontend is available in the `frontend` folder of this repository.
 
-See the [Frontend README](../frontend/README.md) for frontend setup and details.
+See the [Frontend Part README](../frontend/README.md) for frontend setup and details.
 
 ---
 
