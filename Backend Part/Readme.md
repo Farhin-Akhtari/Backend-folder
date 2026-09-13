@@ -101,7 +101,7 @@ git clone https://github.com/Farhin-Akhtari/Backend-folder.git
 ### 2. Navigate to the backend
 
 ```bash
-cd backend
+cd Backend Part
 ```
 
 ### 3. Install dependencies
@@ -144,7 +144,7 @@ npm run dev
 
 The PlayNest frontend is available in the `frontend` folder of this repository.
 
-See the [Frontend Part README](../frontend/README.md) for frontend setup and details.
+See the [Frontend Part README](../Frontend Part/README.md) for frontend setup and details.
 
 ---
 

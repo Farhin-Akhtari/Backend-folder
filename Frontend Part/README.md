@@ -111,7 +111,7 @@ git clone https://github.com/Farhin-Akhtari/Backend-folder.git
 ### 2. Navigate to the frontend folder
 
 ```bash
-cd frontend
+cd Backend Part
 ```
 
 ### 3. Install dependencies
