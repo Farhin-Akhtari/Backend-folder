@@ -105,7 +105,7 @@ Services include:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Farhin-Akhtari/Backend-folder.git
+git clone https://github.com/Farhin-Akhtari/PlayNest.git
 ```
 
 ### 2. Navigate to the frontend folder

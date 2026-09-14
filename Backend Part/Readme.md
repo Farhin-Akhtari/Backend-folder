@@ -95,7 +95,7 @@ Built with **Node.js, Express.js, MongoDB, and Mongoose**, the backend provides 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Farhin-Akhtari/Backend-folder.git
+git clone https://github.com/Farhin-Akhtari/PlayNest.git
 ```
 
 ### 2. Navigate to the backend
