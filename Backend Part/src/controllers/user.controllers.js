@@ -35,6 +35,10 @@ const registerUser = asyncHandler(async (req, res) => {
    //check for user creation
    //if creates then return response
 
+console.log("REGISTER API HIT");
+console.log("BODY:", req.body);
+console.log("FILES:", req.files);
+
 
   const{fullName, email, username, password} = req.body
   console.log("email: ", email);
